@@ -10,9 +10,6 @@ using Xunit.Abstractions;
 
 namespace TestFrame.Base
 {
-    [TestCaseOrderer(
-    ordererTypeName: "TestFrame.SequenceOrder",
-    ordererAssemblyName: "TestFrame")]
     public class AcceptanceTestsBase<TFixture> : IClassFixture<TFixture> where TFixture : class
     {
         protected readonly ITestOutputHelper output;
