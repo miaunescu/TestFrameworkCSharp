@@ -7,12 +7,12 @@ using Xunit;
 
 namespace TestFrame
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class FactSequenceAttribute : FactAttribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class TestPriorityAttribute : Attribute
     {
         public int Sequence { get; private set; }
 
-        public FactSequenceAttribute(int sequenceNumber)
+        public TestPriorityAttribute(int sequenceNumber)
         {
             Sequence = sequenceNumber;
         }

@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace TestFrame
 {
-    public class SequenceOrder: ITestCaseOrderer
+    public class SequenceOrder : ITestCaseOrderer
     {
         public IEnumerable<TTestCase> OrderTestCases<TTestCase>(
         IEnumerable<TTestCase> testCases) where TTestCase : ITestCase
         {
-            string assemblyName = typeof(FactSequenceAttribute).AssemblyQualifiedName!;
+            string assemblyName = typeof(TestPriorityAttribute).AssemblyQualifiedName!;      
             var sortedMethods = new SortedDictionary<int, List<TTestCase>>();
             foreach (TTestCase testCase in testCases)
             {
                 int priority = testCase.TestMethod.Method
                     .GetCustomAttributes(assemblyName)
                     .FirstOrDefault()
-                    ?.GetNamedArgument<int>(nameof(FactSequenceAttribute.Sequence)) ?? 0;
+                    ?.GetNamedArgument<int>(nameof(TestPriorityAttribute.Sequence)) ?? 0;            
 
                 GetOrCreate(sortedMethods, priority).Add(testCase);
             }
@@ -33,6 +28,7 @@ namespace TestFrame
                 yield return testCase;
             }
         }
+
         private static TValue GetOrCreate<TKey, TValue>(
         IDictionary<TKey, TValue> dictionary, TKey key)
         where TKey : struct

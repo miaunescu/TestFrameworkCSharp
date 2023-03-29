@@ -30,7 +30,7 @@ namespace TestFrame.Tests
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
         }
 
-        [FactSequence(1)]
+        [Fact, TestPriority(1)]
         public async Task Get_Pet_By_Id_Test()
         {
             var request = new RestRequest($"/v2/pet/{TestFixture.PetID}", Method.Get);

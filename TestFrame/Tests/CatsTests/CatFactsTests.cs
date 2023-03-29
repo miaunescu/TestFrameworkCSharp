@@ -6,6 +6,7 @@ using TestFrame.Base;
 using TestFrame.Builder;
 using TestFrame.Fixtures;
 using TestFrame.Models.CatsModels;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace TestFrame.Tests.CatsTests
@@ -23,7 +24,7 @@ namespace TestFrame.Tests.CatsTests
             restFactory = new RestFactory(restBuilder);
         }
 
-        [FactSequence(1)]
+        [Fact,TestPriority(1)]
         public async Task Get_Cats_Test()
         {
 
