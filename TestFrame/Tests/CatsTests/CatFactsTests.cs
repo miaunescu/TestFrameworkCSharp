@@ -5,27 +5,26 @@ using System.Net;
 using TestFrame.Base;
 using TestFrame.Builder;
 using TestFrame.Fixtures;
-using TestFrame.Models;
+using TestFrame.Models.CatsModels;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace TestFrame.Tests
+namespace TestFrame.Tests.CatsTests
 {
-    public class CatFactsTests : AcceptanceTestsBase<CatsTestsFixture>
+    public class CatFactsTests : OrderedAcceptanceTestsBase<CatsTestsFixture>
     {
         private RestBuilder restBuilder = new RestBuilder();
         private RestFactory restFactory;
-        // private readonly IRestClientFactoryBuilder _restClientFactoryBuilder;
         public CatFactsTests(CatsTestsFixture testfixture, ITestOutputHelper outputHelper) : base(testfixture, outputHelper)
         {
-            var api = config.GetSection("TestData")["CatsApiUri"];
+            var api = config.GetSection("CatsTestData")["CatsApiUri"];
             TestFixture.Api = api;
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
-            TestFixture.Limit = int.Parse(config.GetSection("TestData")["Limit"]);
-            //_restClientFactoryBuilder = restClientFactoryBuilder;
+            TestFixture.Limit = int.Parse(config.GetSection("CatsTestData")["Limit"]);
             restFactory = new RestFactory(restBuilder);
         }
 
-        [FactSequence(1)]
+        [Fact,TestPriority(1)]
         public async Task Get_Cats_Test()
         {
 
@@ -39,10 +38,9 @@ namespace TestFrame.Tests
             #region Assertions
             using (new AssertionScope())
             {
-                getResponse.Data.ElementAt(0).breed.Should().Be("Abyssinian");
+                getResponse.Data.ElementAt(0).Breed.Should().Be("Abyssinian");
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
             }
-
             #endregion
 
         }
