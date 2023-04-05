@@ -33,9 +33,8 @@ namespace TestFrame.Tests
         public async Task Get_Country_By_Name_Test()
         {
             var response = await restFactory.Create()
-                                            .WithRequest("/name/Romania", Method.Get)
-                                            //.WithQueryParameter("name", $"{TestFixture.Name}")
-                                            .Execute<List<CountryModel>>(TestFixture.Client);
+                                            .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+                                            .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
         }
 
