@@ -32,7 +32,7 @@ namespace TestFrame.Tests
         [Fact, TestPriority(1)]
         public async Task Get_Country_By_Name_Test()
         {
-            var response = await restFactory.Create()
+           var response = await restFactory.Create()
                                             .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                                             .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;

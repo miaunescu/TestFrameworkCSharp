@@ -6,17 +6,8 @@ namespace TestFrame.Models.CountriesModels
     {
         [JsonPropertyName("name")]
         public NameModel Name { get; set; }
-        //Search by country name. If you want to get an exact match, use the next endpoint. It can be the common or official value
-
-
-        //[JsonPropertyName("code")]
-        //public string Code { get; set; }
-        ////Search by cca2, ccn3, cca3 or cioc country code (yes, any!)
-
-
-        //[JsonPropertyName("currencies")]
-        //public string Currencies { get; set; }
-        ////Search by currency code or name
+        //Search by country name. If you want to get an exact match, use the next endpoint.
+        //It can be the common or official value
 
 
         [JsonPropertyName("tld")]
@@ -35,24 +26,6 @@ namespace TestFrame.Models.CountriesModels
         public string Cioc { get; set; }
 
 
-        [JsonPropertyName("capital")]
-        public List<String> Capital { get; set; }
-        ////Search by capital city
-
-        [JsonPropertyName("region")]
-        public string Region { get; set; }
-        //Search by region (replace X with the version you want to use)
-
-
-        [JsonPropertyName("subregion")]
-        public string SubRegion { get; set; }
-        //You can search by subregions (replace X with the version you want to use)
-
-
-        [JsonPropertyName("borders")]
-        public List<String> Borders { get; set; }
-
-
         [JsonPropertyName("independent")]
         public Boolean Independent { get; set; }
 
@@ -65,32 +38,60 @@ namespace TestFrame.Models.CountriesModels
         public Boolean UnMember { get; set; }
 
 
+        [JsonPropertyName("idd")]
+        public IddModel Idd { get; set; }
+
+
+        [JsonPropertyName("capital")]
+        public List<String> Capital { get; set; }
+        //Search by capital city
+
+
         [JsonPropertyName("altSpellings")]
         public List<String> AltSpellings { get; set; }
+
+
+        [JsonPropertyName("region")]
+        public string Region { get; set; }
+        //Search by region (replace X with the version you want to use)
+
+
+        [JsonPropertyName("subregion")]
+        public string SubRegion { get; set; }
+        //You can search by subregions (replace X with the version you want to use)
+
+
+        //languages de facut - dinamic
+
+        //translations de facut
 
 
         [JsonPropertyName("latlng")]
         public List<float> Latlng { get; set; }
 
-
         [JsonPropertyName("landlocked")]
         public Boolean Landlocked { get; set; }
 
+        [JsonPropertyName("borders")]
+        public List<String> Borders { get; set; }
 
         [JsonPropertyName("area")]
         public float Area { get; set; }
 
 
+        //denonyms de facut
+
         [JsonPropertyName("flag")]
         public string Flag { get; set; }
-
 
         [JsonPropertyName("maps")]
         public MapsModel Maps { get; set; }
 
 
         [JsonPropertyName("population")]
-        public double Population { get; set; }
+        public float Population { get; set; }
+
+        //gini de facut
 
 
         [JsonPropertyName("fifa")]
@@ -109,7 +110,26 @@ namespace TestFrame.Models.CountriesModels
         public List<string> Continents { get; set; }
 
 
+        [JsonPropertyName("flags")]
+        public FlagsModel Flags { get; set; }
 
+
+        [JsonPropertyName("startOfWeek")]
+        public string StartOfWeek { get; set; }
+
+
+        [JsonPropertyName("capitalInfo")]
+        public CapitalInfoModel CapitalInfo { get; set; }
+
+
+        //denonyms de facut
+
+
+
+
+
+        //capitalInfo de facut
+        //postalCode de facut
 
         //[JsonPropertyName("translations")]
         //public TranslationModel Translations { get; set; }
