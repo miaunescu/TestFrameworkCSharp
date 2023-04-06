@@ -36,6 +36,7 @@ namespace TestFrame.Tests
                                             .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                                             .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
+            var values = getResponse[0].Currencies.Currency;
         }
 
     }

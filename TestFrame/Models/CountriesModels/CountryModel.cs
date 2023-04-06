@@ -9,7 +9,6 @@ namespace TestFrame.Models.CountriesModels
         //Search by country name. If you want to get an exact match, use the next endpoint.
         //It can be the common or official value
 
-
         [JsonPropertyName("tld")]
         public List<string> Tld { get; set; }
 
@@ -25,113 +24,89 @@ namespace TestFrame.Models.CountriesModels
         [JsonPropertyName("cioc")]
         public string Cioc { get; set; }
 
-
         [JsonPropertyName("independent")]
-        public Boolean Independent { get; set; }
-
+        public bool Independent { get; set; }
 
         [JsonPropertyName("status")]
         public string Status { get; set; }
 
-
         [JsonPropertyName("unMember")]
-        public Boolean UnMember { get; set; }
+        public bool UnMember { get; set; }
 
+        [JsonPropertyName("currencies")]
+        public Currencies Currencies { get; set; }
 
         [JsonPropertyName("idd")]
         public IddModel Idd { get; set; }
 
-
         [JsonPropertyName("capital")]
-        public List<String> Capital { get; set; }
+        public List<string> Capital { get; set; }
         //Search by capital city
 
-
         [JsonPropertyName("altSpellings")]
-        public List<String> AltSpellings { get; set; }
-
+        public List<string> AltSpellings { get; set; }
 
         [JsonPropertyName("region")]
         public string Region { get; set; }
         //Search by region (replace X with the version you want to use)
 
-
         [JsonPropertyName("subregion")]
         public string SubRegion { get; set; }
         //You can search by subregions (replace X with the version you want to use)
-
 
         //languages de facut - dinamic
 
         //translations de facut
 
-
         [JsonPropertyName("latlng")]
         public List<float> Latlng { get; set; }
 
         [JsonPropertyName("landlocked")]
-        public Boolean Landlocked { get; set; }
+        public bool Landlocked { get; set; }
 
         [JsonPropertyName("borders")]
-        public List<String> Borders { get; set; }
+        public List<string> Borders { get; set; }
 
         [JsonPropertyName("area")]
         public float Area { get; set; }
 
-
-        //denonyms de facut
-
         [JsonPropertyName("flag")]
         public string Flag { get; set; }
 
-
         [JsonPropertyName("maps")]
         public MapsModel Maps { get; set; }
-
 
         [JsonPropertyName("population")]
         public float Population { get; set; }
 
         //gini de facut
 
-
         [JsonPropertyName("fifa")]
         public string Fifa { get; set; }
-
 
         [JsonPropertyName("car")]
         public CarModel Car { get; set; }
 
-
         [JsonPropertyName("timezones")]
         public List<string> Timezones { get; set; }
-
 
         [JsonPropertyName("continents")]
         public List<string> Continents { get; set; }
 
-
         [JsonPropertyName("flags")]
         public FlagsModel Flags { get; set; }
-
 
         [JsonPropertyName("startOfWeek")]
         public string StartOfWeek { get; set; }
 
-
         [JsonPropertyName("capitalInfo")]
         public CapitalInfoModel CapitalInfo { get; set; }
-
-
-        //denonyms de facut
 
         [JsonPropertyName("postalCode")]
         public PostalCode PostalCode { get; set; }
 
-
         [JsonPropertyName("demonyms")]
         public DemonymsModel Demonyms { get; set; }
-
 
         //[JsonPropertyName("translations")]
         //public TranslationModel Translations { get; set; }
