@@ -34,7 +34,7 @@ namespace TestFrame.Models.CountriesModels
         public bool UnMember { get; set; }
 
         [JsonPropertyName("currencies")]
-        public Currencies Currencies { get; set; }
+        public CurrenciesModel Currencies { get; set; }
 
         [JsonPropertyName("idd")]
         public IddModel Idd { get; set; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace TestFrame.Models.CountriesModels
 {
-    public class Currencies
+    public class CurrenciesModel
     {
         [JsonExtensionData]
         public JsonObject Currency { get; set; }
