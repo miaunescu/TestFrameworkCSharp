@@ -84,6 +84,7 @@ namespace TestFrame.Models.CountriesModels
         [JsonPropertyName("flag")]
         public string Flag { get; set; }
 
+
         [JsonPropertyName("maps")]
         public MapsModel Maps { get; set; }
 
@@ -124,12 +125,13 @@ namespace TestFrame.Models.CountriesModels
 
         //denonyms de facut
 
+        [JsonPropertyName("postalCode")]
+        public PostalCode PostalCode { get; set; }
 
 
+        [JsonPropertyName("demonyms")]
+        public DemonymsModel Demonyms { get; set; }
 
-
-        //capitalInfo de facut
-        //postalCode de facut
 
         //[JsonPropertyName("translations")]
         //public TranslationModel Translations { get; set; }
