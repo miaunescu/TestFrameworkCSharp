@@ -5,7 +5,7 @@ namespace TestFrame.Models.CountriesModels
     public class CapitalInfoModel
     {
         [JsonPropertyName("latlang")]
-        public List<float> Latlang { get; set; }
+        public List<double> Latlang { get; set; }
 
     }
 }
