@@ -53,7 +53,6 @@ namespace TestFrame.Tests
             };
 
 
-
             //Create new object "iddCountry" based on IddModel
             var iddCountry = new IddModel()
             {
@@ -69,16 +68,16 @@ namespace TestFrame.Tests
                 Side = "right"
             };
 
-            //Create new object "capitalCountru" based on CapitalInfoModel
-            var capitalCountru = new CapitalInfoModel()
+            //Create new object "capitalCountry" based on CapitalInfoModel
+            var capitalCountry = new CapitalInfoModel()
             {
-                //CapitalInfo = ?,  ?????  DE FACUT AICI    
+                //Latlang = new List<double> { 44.43 , 26.1 }
             };
 
             //Create new object "currencyCountry" based on CurrenciesModel
             var currencyCountry = new CurrenciesModel()
             {
-                //Currency = "RON"  ?????  DE FACUT AICI    
+                //Currency = { "RON" }   
             };
 
             //Create new object "postalcodeCountry" based on PostalCodeModel
@@ -126,7 +125,7 @@ namespace TestFrame.Tests
                 AltSpellings = new List<string> { "RO", "Rumania", "Roumania","România"},
                 Tld = new List<string> { ".ro" },
                 Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR"},
-                Latlng = new List<double> { 46.0, 25.0},
+                Latlng = new List<double> { 46.0, 25.0 },
                 Timezones = new List<string> { "UTC+02:00" },
                 Continents = new List<string> { "Europe" }
             };
@@ -161,6 +160,8 @@ namespace TestFrame.Tests
                 //Check country region, subregion
                 //Check country landlocked, area, flag
                 //Check country population, fifa, start of week
+                //Check country capital, altspecllings, tld
+                //Check country borders, latlng, timezones, continents
                 //==========================================================
                 getResponse[0].Cca2.Should().Be(createCountryModel.Cca2);
                 getResponse[0].Cca3.Should().Be(createCountryModel.Cca3);
@@ -186,13 +187,13 @@ namespace TestFrame.Tests
                 getResponse[0].Continents.Should().BeEquivalentTo(createCountryModel.Continents);
 
                 //==========================================================
-                //Check country name
+                //Check country name - Common and Official
                 //==========================================================
                 getResponse[0].Name.Common.Should().Be(nameCountry.Common);
                 getResponse[0].Name.Official.Should().Be(nameCountry.Official);
 
                 //==========================================================
-                //Check country map
+                //Check country map - Google and Open Street
                 //==========================================================
                 getResponse[0].Maps.GoogleMaps.Should().Be(mapsCountry.GoogleMaps);
                 getResponse[0].Maps.OpenStreetMaps.Should().Be(mapsCountry.OpenStreetMaps);
@@ -206,24 +207,32 @@ namespace TestFrame.Tests
 
 
                 //==========================================================
-                //Check country Idd
+                //Check country Idd - Root and Suffixes
                 //==========================================================
                 getResponse[0].Idd.Root.Should().Be(iddCountry.Root);
                 getResponse[0].Idd.Suffixes.Should().BeEquivalentTo(iddCountry.Suffixes);
 
 
                 //==========================================================
-                //Check country Car
+                //Check country Car - Signs and Car
                 //==========================================================
                 getResponse[0].Car.Signs.Should().BeEquivalentTo(carCountry.Signs);
                 getResponse[0].Car.Side.Should().Be(carCountry.Side);
 
 
                 //==========================================================
-                //Check country Postal Code
+                //Check country Postal Code - Format and Regex
                 //==========================================================
                 getResponse[0].PostalCode.Format.Should().Be(postalcodeCountry.Format);
                 getResponse[0].PostalCode.Regex.Should().Be(postalcodeCountry.Regex);
+
+
+                //==========================================================
+                //Check country Capital Info
+                //==========================================================
+                //getResponse[0].CapitalInfo.Latlang.Should().BeEquivalentTo(capitalCountry.Latlang);
+                
+
 
                 //==========================================================
                 //Check object is not null
@@ -232,6 +241,55 @@ namespace TestFrame.Tests
             }
             #endregion
         }
+
+
+        //=============
+        //   Test 2
+        //=============
+        [Fact, TestPriority(1)]
+        public async Task Check_Latitude_Longitude()
+        {
+            var response = await restFactory.Create()
+                                             .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+                                             .Execute<List<CountryModel>>(TestFixture.Client);
+            var getResponse = response.Data;
+
+
+            //Create new object "createCountryModel" based on CountryModel
+            var createCountryModel = new CountryModel()
+            {
+
+                Latlng = new List<double> { 46.0, 25.0 },
+
+            };
+
+            #region Asserts
+            using (new AssertionScope())
+            {
+
+                //==========================================================
+                //Check HTTP status code
+                //==========================================================
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Content.FirstOrDefault();
+
+                //==========================================================
+                //Check country latlng
+                //Latlng[0] = latitude
+                //Latlng[1] = longitude
+                //Latitude and longitude are a pair of numbers (coordinates)
+                //used to describe a position on the plane of a geographic
+                //coordinate system. The numbers are in decimal degrees format
+                //and range from -90 to 90 for latitude
+                //and -180 to 180 for longitude.
+                //==========================================================
+                getResponse[0].Latlng.Should().NotBeNullOrEmpty();
+                getResponse[0].Latlng[0].Should().BeInRange(-90, 90);
+                getResponse[0].Latlng[1].Should().BeInRange(-180, 180);
+            }
+            #endregion
+        }
+
     }
 }
 

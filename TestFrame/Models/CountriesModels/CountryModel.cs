@@ -36,6 +36,9 @@ namespace TestFrame.Models.CountriesModels
         [JsonPropertyName("currencies")]
         public CurrenciesModel Currencies { get; set; }
 
+        [JsonPropertyName("translations")]
+        public CurrenciesModel Translations { get; set; }
+
         [JsonPropertyName("idd")]
         public IddModel Idd { get; set; }
 
@@ -55,8 +58,6 @@ namespace TestFrame.Models.CountriesModels
         //You can search by subregions (replace X with the version you want to use)
 
         //languages de facut - dinamic
-
-        //translations de facut
 
         [JsonPropertyName("latlng")]
         public List<double> Latlng { get; set; }
@@ -108,8 +109,5 @@ namespace TestFrame.Models.CountriesModels
         [JsonPropertyName("demonyms")]
         public DemonymsModel Demonyms { get; set; }
 
-        //[JsonPropertyName("translations")]
-        //public TranslationModel Translations { get; set; }
-        ////You can search by any translation name
     }
 }

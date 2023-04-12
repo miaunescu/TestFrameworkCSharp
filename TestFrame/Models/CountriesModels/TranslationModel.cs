@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace TestFrame.Models.CountriesModels
 {
     public class TranslationModel
     {
-        [JsonPropertyName("tags")]
-        public List<String>[] Translations { get; set; }
+        [JsonExtensionData]
+        public JsonObject Translation { get; set; }
     }
 }
