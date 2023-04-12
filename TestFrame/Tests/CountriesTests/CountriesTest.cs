@@ -290,6 +290,44 @@ namespace TestFrame.Tests
             #endregion
         }
 
+
+        //=============
+        //   Test 3
+        //=============
+        [Fact, TestPriority(1)]
+        public async Task Check_Continents()
+        {
+            var response = await restFactory.Create()
+                                             .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+                                             .Execute<List<CountryModel>>(TestFixture.Client);
+            var getResponse = response.Data;
+
+
+            //Create new object "createCountryModel" based on CountryModel
+            //var createCountryModel = new CountryModel()
+            //{
+            //    var Continents = new List<string> { "Africa", "Antarctica", "Asia", "Europe", "North America", "Australia/Oceania", "South America" }
+            //};
+
+            #region Asserts
+            using (new AssertionScope())
+            {
+
+                //==========================================================
+                //Check HTTP status code
+                //==========================================================
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Content.FirstOrDefault();
+
+                //==========================================================
+                //Check that continent is in the list of expected continents
+                //==========================================================
+                var Continents = new List<string> { "Africa", "Antarctica", "Asia", "Europe", "North America", "Australia/Oceania", "South America" };
+                getResponse[0].Continents.Should().ContainSingle(continent => Continents.Contains(continent));
+
+            }
+            #endregion
+        }
     }
 }
 
