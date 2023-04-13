@@ -246,7 +246,7 @@ namespace TestFrame.Tests
         //=============
         //   Test 2
         //=============
-        [Fact, TestPriority(1)]
+        [Fact, TestPriority(2)]
         public async Task Check_Latitude_Longitude()
         {
             var response = await restFactory.Create()
@@ -294,7 +294,7 @@ namespace TestFrame.Tests
         //=============
         //   Test 3
         //=============
-        [Fact, TestPriority(1)]
+        [Fact, TestPriority(3)]
         public async Task Check_Continents()
         {
             var response = await restFactory.Create()
@@ -302,12 +302,6 @@ namespace TestFrame.Tests
                                              .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
 
-
-            //Create new object "createCountryModel" based on CountryModel
-            //var createCountryModel = new CountryModel()
-            //{
-            //    var Continents = new List<string> { "Africa", "Antarctica", "Asia", "Europe", "North America", "Australia/Oceania", "South America" }
-            //};
 
             #region Asserts
             using (new AssertionScope())
