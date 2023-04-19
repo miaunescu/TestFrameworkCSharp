@@ -12,7 +12,7 @@ using TestFrame.Models.CountriesModels;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TestFrame.Tests
+namespace TestFrame.Tests.CountriesTest
 {
     public class CountriesTest : OrderedAcceptanceTestsBase<CountriesTestFixtures>
     {

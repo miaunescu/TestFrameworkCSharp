@@ -18,7 +18,7 @@ using TestFrame.Models.PetsModels;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TestFrame.Tests
+namespace TestFrame.Tests.PetsTests
 {
     public class PetsTests : OrderedAcceptanceTestsBase<PetsTestFixture>
     {
