@@ -5,6 +5,6 @@ namespace TestFrame.Models.CountriesModels
     public class TranslationModel
     {
         [JsonPropertyName("tags")]
-        public List<String>[] Translations { get; set; }
+        public List<string>[] Translations { get; set; }
     }
 }

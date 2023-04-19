@@ -59,7 +59,7 @@ namespace TestFrame.Models.CountriesModels
         //translations de facut
 
         [JsonPropertyName("latlng")]
-        public List<float> Latlng { get; set; }
+        public List<double> Latlng { get; set; }
 
         [JsonPropertyName("landlocked")]
         public bool Landlocked { get; set; }
@@ -103,7 +103,7 @@ namespace TestFrame.Models.CountriesModels
         public CapitalInfoModel CapitalInfo { get; set; }
 
         [JsonPropertyName("postalCode")]
-        public PostalCode PostalCode { get; set; }
+        public PostalCodeModel PostalCode { get; set; }
 
         [JsonPropertyName("demonyms")]
         public DemonymsModel Demonyms { get; set; }
