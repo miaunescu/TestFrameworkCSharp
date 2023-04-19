@@ -30,6 +30,8 @@ namespace TestFrame.Tests.TheCatAPITests
         {
             var request = new RestRequest($"/v1/votes/{TestFixture.VoteId}", Method.Get);
             request.AddHeader("x-api-key", $"{TestFixture.ApiKey}");
+            request.AddHeader("exchangeId", TestFixture.CorrelationId);
+
 
             var response = await TestFixture.Client.ExecuteAsync<GetCatVotesModel>(request);
             var responseGet = response.Data;
@@ -48,6 +50,8 @@ namespace TestFrame.Tests.TheCatAPITests
         {
             var request = new RestRequest("/v1/votes", Method.Post);
             request.AddHeader("x-api-key", $"{TestFixture.ApiKey}");
+            request.AddHeader("exchangeId", TestFixture.CorrelationId);
+
 
             var createCatVotesModel = new CreateCatVotesModel()
             {
@@ -78,6 +82,8 @@ namespace TestFrame.Tests.TheCatAPITests
         {
             var request = new RestRequest($"/v1/votes/{TestFixture.VoteId}", Method.Delete);
             request.AddHeader("x-api-key", $"{TestFixture.ApiKey}");
+            request.AddHeader("exchangeId", TestFixture.CorrelationId);
+
 
             var response = await TestFixture.Client.ExecuteAsync<DeleteVoteResponseModel>(request);
             var responseDelete = response.Data;
@@ -93,6 +99,8 @@ namespace TestFrame.Tests.TheCatAPITests
         public async Task Create_Cats_Vote_Negative_Test()
         {
             var request = new RestRequest("/v1/votes", Method.Post);
+            request.AddHeader("exchangeId", TestFixture.CorrelationId);
+
 
             var createCatVotesModel = new CreateCatVotesModel()
             {
