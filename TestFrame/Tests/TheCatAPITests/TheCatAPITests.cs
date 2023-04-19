@@ -12,6 +12,7 @@ using TestFrame.Fixtures;
 using TestFrame.Models.TheCatApi;
 using Xunit;
 using Xunit.Abstractions;
+using static TestFrame.Attributes.TestCaseAttribute;
 
 namespace TestFrame.Tests.TheCatAPITests
 {
@@ -26,6 +27,8 @@ namespace TestFrame.Tests.TheCatAPITests
         }
 
         [Fact, TestPriority(2)]
+        [TestCategory("API", "CatsApi")]
+
         public async Task Get_Cats_Votes_Test()
         {
             var request = new RestRequest($"/v1/votes/{TestFixture.VoteId}", Method.Get);
@@ -46,6 +49,7 @@ namespace TestFrame.Tests.TheCatAPITests
         }
 
         [Fact, TestPriority(1)]
+        [TestCategory("API", "CatsApi")]
         public async Task Create_Cats_Votes_Test()
         {
             var request = new RestRequest("/v1/votes", Method.Post);
@@ -78,6 +82,7 @@ namespace TestFrame.Tests.TheCatAPITests
         }
 
         [Fact, TestPriority(3)]
+        [TestCategory("API", "CatsApi")]
         public async Task Delete_Vote_Test()
         {
             var request = new RestRequest($"/v1/votes/{TestFixture.VoteId}", Method.Delete);
@@ -96,6 +101,8 @@ namespace TestFrame.Tests.TheCatAPITests
         }
 
         [Fact]
+        [TestCategory("API", "CatsApi")]
+
         public async Task Create_Cats_Vote_Negative_Test()
         {
             var request = new RestRequest("/v1/votes", Method.Post);
