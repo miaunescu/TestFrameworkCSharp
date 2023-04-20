@@ -131,7 +131,6 @@ namespace TestFrame.Tests
             };
 
 
-
             //[JsonPropertyName("currencies")]
             //public CurrenciesModel Currencies { get; set; }
 
@@ -141,7 +140,6 @@ namespace TestFrame.Tests
 
             //[JsonPropertyName("demonyms")]
             //public DemonymsModel Demonyms { get; set; }
-
 
 
             #region Asserts
