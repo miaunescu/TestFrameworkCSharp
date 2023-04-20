@@ -186,7 +186,9 @@ namespace TestFrame.Tests
 
                 //==========================================================
                 //Check country name - Common and Official
+                //Null check for Name before checking common
                 //==========================================================
+                getResponse[0].Name.Should().NotBeNull();
                 getResponse[0].Name.Common.Should().Be(nameCountry.Common);
                 getResponse[0].Name.Official.Should().Be(nameCountry.Official);
 
