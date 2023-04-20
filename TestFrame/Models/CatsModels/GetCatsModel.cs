@@ -29,7 +29,7 @@ namespace TestFrame.Models.CatsModels
         public string NextPageUrl { get; set; }
 
         [JsonPropertyName("Path")]
-        public string path { get; set; }
+        public string Path { get; set; }
 
         [JsonPropertyName("per_page")]
         public string PerPage { get; set; }
