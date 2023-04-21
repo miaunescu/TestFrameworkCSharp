@@ -36,6 +36,9 @@ namespace TestFrame.Models.CountriesModels
         [JsonPropertyName("currencies")]
         public CurrenciesModel Currencies { get; set; }
 
+        [JsonPropertyName("translations")]
+        public CurrenciesModel Translations { get; set; }
+
         [JsonPropertyName("idd")]
         public IddModel Idd { get; set; }
 
@@ -56,10 +59,8 @@ namespace TestFrame.Models.CountriesModels
 
         //languages de facut - dinamic
 
-        //translations de facut
-
         [JsonPropertyName("latlng")]
-        public List<float> Latlng { get; set; }
+        public List<double> Latlng { get; set; }
 
         [JsonPropertyName("landlocked")]
         public bool Landlocked { get; set; }
@@ -68,7 +69,7 @@ namespace TestFrame.Models.CountriesModels
         public List<string> Borders { get; set; }
 
         [JsonPropertyName("area")]
-        public float Area { get; set; }
+        public double Area { get; set; }
 
         [JsonPropertyName("flag")]
         public string Flag { get; set; }
@@ -77,7 +78,7 @@ namespace TestFrame.Models.CountriesModels
         public MapsModel Maps { get; set; }
 
         [JsonPropertyName("population")]
-        public float Population { get; set; }
+        public double Population { get; set; }
 
         //gini de facut
 
@@ -103,13 +104,10 @@ namespace TestFrame.Models.CountriesModels
         public CapitalInfoModel CapitalInfo { get; set; }
 
         [JsonPropertyName("postalCode")]
-        public PostalCode PostalCode { get; set; }
+        public PostalCodeModel PostalCode { get; set; }
 
         [JsonPropertyName("demonyms")]
         public DemonymsModel Demonyms { get; set; }
 
-        //[JsonPropertyName("translations")]
-        //public TranslationModel Translations { get; set; }
-        ////You can search by any translation name
     }
 }
