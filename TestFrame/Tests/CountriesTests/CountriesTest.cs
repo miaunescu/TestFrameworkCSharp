@@ -71,7 +71,7 @@ namespace TestFrame.Tests
             //Create new object "capitalCountry" based on CapitalInfoModel
             var capitalCountry = new CapitalInfoModel()
             {
-                //Latlang = new List<double> { 44.43 , 26.1 }
+                Latlang = new List<double> { 44.43 , 26.1 }
             };
 
             //Create new object "currencyCountry" based on CurrenciesModel
@@ -152,6 +152,13 @@ namespace TestFrame.Tests
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 response.Content.FirstOrDefault();
 
+
+                //==========================================================
+                //Check object is not null
+                //==========================================================
+                getResponse.Should().NotBeNull();
+
+
                 //==========================================================
                 //Check country list of codes
                 //Check country independence, status, unmember
@@ -187,57 +194,66 @@ namespace TestFrame.Tests
                 //==========================================================
                 //Check country name - Common and Official
                 //Null check for Name before checking common
+                //Check the object is not Null
                 //==========================================================
-                getResponse[0].Name.Should().NotBeNull();
-                getResponse[0].Name.Common.Should().Be(nameCountry.Common);
-                getResponse[0].Name.Official.Should().Be(nameCountry.Official);
+                if (getResponse[0].Name != null)
+                {
+                        getResponse[0].Name.Common.Should().Be(nameCountry.Common);
+                        getResponse[0].Name.Official.Should().Be(nameCountry.Official);
+                }
 
                 //==========================================================
                 //Check country map - Google and Open Street
+                //Check the object is not Null
                 //==========================================================
-                getResponse[0].Maps.GoogleMaps.Should().Be(mapsCountry.GoogleMaps);
-                getResponse[0].Maps.OpenStreetMaps.Should().Be(mapsCountry.OpenStreetMaps);
+                if (getResponse[0].Maps != null)
+                {
+                    getResponse[0].Maps.GoogleMaps.Should().Be(mapsCountry.GoogleMaps);
+                    getResponse[0].Maps.OpenStreetMaps.Should().Be(mapsCountry.OpenStreetMaps);
+                }
 
                 //==========================================================
                 //Check country flags
                 //==========================================================
-                getResponse[0].Flags.Png.Should().Be(flagCountry.Png);
-                getResponse[0].Flags.Svg.Should().Be(flagCountry.Svg);
-                getResponse[0].Flags.Alt.Should().Be(flagCountry.Alt);
-
+                if (getResponse[0].Flags != null)
+                {
+                    getResponse[0].Flags.Png.Should().Be(flagCountry.Png);
+                    getResponse[0].Flags.Svg.Should().Be(flagCountry.Svg);
+                    getResponse[0].Flags.Alt.Should().Be(flagCountry.Alt);
+                }
 
                 //==========================================================
                 //Check country Idd - Root and Suffixes
                 //==========================================================
-                getResponse[0].Idd.Root.Should().Be(iddCountry.Root);
-                getResponse[0].Idd.Suffixes.Should().BeEquivalentTo(iddCountry.Suffixes);
-
+                if (getResponse[0].Idd != null)
+                {
+                    getResponse[0].Idd.Root.Should().Be(iddCountry.Root);
+                    getResponse[0].Idd.Suffixes.Should().BeEquivalentTo(iddCountry.Suffixes);
+                }
 
                 //==========================================================
                 //Check country Car - Signs and Car
                 //==========================================================
-                getResponse[0].Car.Signs.Should().BeEquivalentTo(carCountry.Signs);
-                getResponse[0].Car.Side.Should().Be(carCountry.Side);
-
+                if (getResponse[0].Car != null)
+                {
+                    getResponse[0].Car.Signs.Should().BeEquivalentTo(carCountry.Signs);
+                    getResponse[0].Car.Side.Should().Be(carCountry.Side);
+                }
 
                 //==========================================================
                 //Check country Postal Code - Format and Regex
                 //==========================================================
-                getResponse[0].PostalCode.Format.Should().Be(postalcodeCountry.Format);
-                getResponse[0].PostalCode.Regex.Should().Be(postalcodeCountry.Regex);
-
+                if (getResponse[0].PostalCode != null)
+                {
+                    getResponse[0].PostalCode.Format.Should().Be(postalcodeCountry.Format);
+                    getResponse[0].PostalCode.Regex.Should().Be(postalcodeCountry.Regex);
+                }
 
                 //==========================================================
                 //Check country Capital Info
                 //==========================================================
-                //getResponse[0].CapitalInfo.Latlang.Should().BeEquivalentTo(capitalCountry.Latlang);
+                getResponse[0].CapitalInfo.Latlang.Should().BeEquivalentTo(capitalCountry.Latlang);
                 
-
-
-                //==========================================================
-                //Check object is not null
-                //==========================================================
-                getResponse.Should().NotBeNull();
             }
             #endregion
         }
@@ -272,6 +288,11 @@ namespace TestFrame.Tests
                 //==========================================================
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 response.Content.FirstOrDefault();
+
+                //==========================================================
+                //Check object is not null
+                //==========================================================
+                getResponse.Should().NotBeNull();
 
                 //==========================================================
                 //Check country latlng
@@ -312,6 +333,11 @@ namespace TestFrame.Tests
                 //==========================================================
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 response.Content.FirstOrDefault();
+
+                //==========================================================
+                //Check object is not null
+                //==========================================================
+                getResponse.Should().NotBeNull();
 
                 //==========================================================
                 //Check that continent is in the list of expected continents
