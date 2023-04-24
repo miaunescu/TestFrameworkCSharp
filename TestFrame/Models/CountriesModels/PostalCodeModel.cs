@@ -2,7 +2,7 @@
 
 namespace TestFrame.Models.CountriesModels
 {
-    public class PostalCode
+    public class PostalCodeModel
     {
         [JsonPropertyName("format")]
         public string Format { get; set; }
