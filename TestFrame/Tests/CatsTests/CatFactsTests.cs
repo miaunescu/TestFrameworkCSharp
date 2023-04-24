@@ -40,6 +40,9 @@ namespace TestFrame.Tests.CatsTests
             #region Assertions
             using (new AssertionScope())
             {
+                getResponse.Data.Should().NotBeNullOrEmpty();
+                getResponse.Data.ElementAt(0).Should().NotBeNull();
+
                 getResponse.Data.ElementAt(0).Breed.Should().Be("Abyssinian");
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
             }
@@ -76,6 +79,11 @@ namespace TestFrame.Tests.CatsTests
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
+                
+                getResponse.Data.Should().NotBeNullOrEmpty();
+                getResponse.Links.Should().NotBeNullOrEmpty();
+                getResponse.PerPage.Should().NotBeNullOrEmpty();
+
                 getResponse.Data.Count().Should().BeLessThanOrEqualTo(TestFixture.Limit);
                 getResponse.Links[1].Active.Should().Be(true);
                 getResponse.PerPage.Should().Be($"{TestFixture.Limit}");
@@ -95,6 +103,7 @@ namespace TestFrame.Tests.CatsTests
             #region Assertions
             using (new AssertionScope())
             {
+                getResponse.Fact.Should().NotBeNullOrEmpty();
                 getResponse.Fact.Should().Be("Cats have 3 eyelids.");
                 getResponse.Length.Should().Be(20);
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -140,6 +149,8 @@ namespace TestFrame.Tests.CatsTests
             #region Assertions
             using (new AssertionScope())
             {
+                getResponse.Data.Should().NotBeNullOrEmpty();
+
                 getResponse.PerPage.Should().Be($"{TestFixture.Limit}");
                 getResponse.Data[3].Fact.Should().Be("Cats dislike citrus scent.");
                 getResponse.Data[3].Length.Should().Be(26);
@@ -161,6 +172,7 @@ namespace TestFrame.Tests.CatsTests
             #region Assertions
             using (new AssertionScope())
             {
+                getResponse.Data.Should().NotBeNullOrEmpty();
                 getResponse.Data.All(x => x.Length <= 30).Should().BeTrue();
                 getResponse.PerPage.Should().Be($"{30}");
             }
@@ -181,6 +193,11 @@ namespace TestFrame.Tests.CatsTests
             #region Assertions
             using (new AssertionScope())
             {
+                getResponse.Should().NotBeNull();
+                getResponse.Data.Should().NotBeNullOrEmpty();
+                getResponse.Links.Should().NotBeNullOrEmpty();
+                getResponse.PerPage.Should().NotBeNullOrEmpty();
+
                 getResponse.PerPage.Should().Be($"{10}");
                 getResponse.From.Should().Be(1);
                 getResponse.LastPage.Should().Be(33);
