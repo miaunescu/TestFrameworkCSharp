@@ -16,6 +16,7 @@ using Xunit;
 using Xunit.Abstractions;
 using TestFrame;
 using FluentAssertions.Equivalency;
+using System.Text.Json.Nodes;
 
 namespace TestFrame.Tests.CountriesTest
 {
@@ -348,6 +349,173 @@ namespace TestFrame.Tests.CountriesTest
             }
             #endregion
         }
+
+
+        //===================
+        //   Negative tests
+        //===================
+        [Fact, TestPriority(4)]
+        public async Task Get_Country_By_Name_Negative_Test()
+        {
+            var response = await restFactory.Create()
+                                            .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+                                            .Execute<List<CountryModel>>(TestFixture.Client);
+            var getResponse = response.Data;
+
+            var values = getResponse[0].Currencies.Currency;
+
+            //Create new object "wrongNameCountry" based on NameModel
+            var wrongNameCountry = new NameModel()
+            {
+                Common = "Rooomaaaaniiiaaaa",
+                Official = "Roamaaniaa"
+            };
+
+            //Create new object "wrongIddCountry" based on IddModel
+            var wrongIddCountry = new IddModel()
+            {
+                Root = "+7",
+                Suffixes = new List<string> { "8" }
+            };
+
+            //Create new object "wrongCarCountry" based on CarModel
+            var wrongCarCountry = new CarModel()
+            {
+                Signs = new List<string> { "ROOO" },
+                Side = "left"
+            };
+
+            //Create new object "wrongCapitalCountry" based on CapitalInfoModel
+            var wrongCapitalCountry = new CapitalInfoModel()
+            {
+                Latlang = new List<double> { 43.43, 25.1 }
+            };
+
+            //Create new dictonary "wrongValuesCurrency" based on CurrenciesModel
+            Dictionary<string, string> wrongValuesCurrency = new Dictionary<string, string>
+            {
+                {"name", "Romanian ron" },
+                {"symbol", "ron" }
+            };
+
+            //Create new object "wrongPostalcodeCountry" based on PostalCodeModel
+            var wrongPostalcodeCountry = new PostalCodeModel()
+            {
+                Format = "####",
+                Regex = "^(\\d{4})$"
+            };
+
+            //Create new object "wrongMaspCountry" based on MapsModel
+            var wrongMapsCountry = new MapsModel()
+            {
+                GoogleMaps = "https://goo.gl/maps/845hAgCf1mDkN3vr5",
+                OpenStreetMaps = "https://www.openstreetmap.org/relation/90685"
+            };
+
+            //Create new object "wrongFlagCountry" based on FlagsModel
+            var wrongFlagCountry = new FlagsModel()
+            {
+                Png = "https://flagcdn.com/w320/ro.jpg",
+                Svg = "https://flagcdn.com/ro.png",
+                Alt = "The flag of Romania is composed of three equal vertical bands of navy blue, green and red."
+            };
+
+
+            //Create new object "wrongCountryModel" based on CountryModel
+            var wrongCountryModel = new CountryModel()
+            {
+                Cca2 = "ROTest",
+                Cca3 = "ROUTest",
+                Ccn3 = "642Test",
+                Cioc = "ROUTest",
+                Independent = false,
+                Status = "officially-assignedTest",
+                UnMember = false,
+                Region = "Africa",
+                SubRegion = "Southeast Africa",
+                Landlocked = true,
+                Area = 238399,
+                Flag = "🇷🇴Test",
+                Population = 19286126,
+                Fifa = "ROUTest",
+                StartOfWeek = "tuesday",
+                Capital = new List<string> { "Iasi" },
+                AltSpellings = new List<string> { "ROOO", "Rumaniaaaa", "Roumaniaaaa", "Româniaaaaa" },
+                Tld = new List<string> { ".ro.net" },
+                Borders = new List<string> { "BG", "HU", "MD", "SR", "UK" },
+                Latlng = new List<double> { 45.0, 24.0 },
+                Timezones = new List<string> { "UTC+03:00" },
+                Continents = new List<string> { "Africa" }
+            };
+
+            #region Asserts
+            using (new AssertionScope())
+            {
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                response.Content.FirstOrDefault();
+
+                getResponse[0].Cca2.Should().NotBe(wrongCountryModel.Cca2);
+                getResponse[0].Cca3.Should().NotBe(wrongCountryModel.Cca3);
+                getResponse[0].Ccn3.Should().NotBe(wrongCountryModel.Ccn3);
+                getResponse[0].Cioc.Should().NotBe(wrongCountryModel.Cioc);
+                getResponse[0].Independent.Should().NotBe(wrongCountryModel.Independent);
+                getResponse[0].Status.Should().NotBe(wrongCountryModel.Status);
+                getResponse[0].UnMember.Should().NotBe(wrongCountryModel.UnMember);
+                getResponse[0].Region.Should().NotBe(wrongCountryModel.Region);
+                getResponse[0].SubRegion.Should().NotBe(wrongCountryModel.SubRegion);
+                getResponse[0].Landlocked.Should().NotBe(wrongCountryModel.Landlocked);
+                getResponse[0].Area.Should().NotBe(wrongCountryModel.Area);
+                getResponse[0].Flag.Should().NotBe(wrongCountryModel.Flag);
+                getResponse[0].Population.Should().NotBe(wrongCountryModel.Population);
+                getResponse[0].Fifa.Should().NotBe(wrongCountryModel.Fifa);
+                getResponse[0].StartOfWeek.Should().NotBe(wrongCountryModel.StartOfWeek);
+                getResponse[0].Capital.Should().NotBeEquivalentTo(wrongCountryModel.Capital);
+                getResponse[0].AltSpellings.Should().NotBeEquivalentTo(wrongCountryModel.AltSpellings);
+                getResponse[0].Tld.Should().NotBeEquivalentTo(wrongCountryModel.Tld);
+                getResponse[0].Borders.Should().NotBeEquivalentTo(wrongCountryModel.Borders);
+                getResponse[0].Latlng.Should().NotBeEquivalentTo(wrongCountryModel.Latlng);
+                getResponse[0].Timezones.Should().NotBeEquivalentTo(wrongCountryModel.Timezones);
+                getResponse[0].Continents.Should().NotBeEquivalentTo(wrongCountryModel.Continents);
+
+                getResponse[0].CapitalInfo.Should().NotBeEquivalentTo(wrongCapitalCountry.Latlang);
+
+                getResponse[0].Name.Common.Should().NotBe(wrongNameCountry.Common);
+                getResponse[0].Name.Official.Should().NotBe(wrongNameCountry.Official);
+
+                getResponse[0].Maps.GoogleMaps.Should().NotBe(wrongMapsCountry.GoogleMaps);
+                getResponse[0].Maps.OpenStreetMaps.Should().NotBe(wrongMapsCountry.OpenStreetMaps);
+
+                getResponse[0].Flags.Png.Should().NotBe(wrongFlagCountry.Png);
+                getResponse[0].Flags.Svg.Should().NotBe(wrongFlagCountry.Svg);
+                getResponse[0].Flags.Alt.Should().NotBe(wrongFlagCountry.Alt);
+
+                getResponse[0].Idd.Root.Should().NotBe(wrongIddCountry.Root);
+                getResponse[0].Idd.Suffixes.Should().NotBeEquivalentTo(wrongIddCountry.Suffixes);
+
+                getResponse[0].Car.Signs.Should().NotBeEquivalentTo(wrongCarCountry.Signs);
+                getResponse[0].Car.Side.Should().NotBe(wrongCarCountry.Side);
+
+                getResponse[0].PostalCode.Format.Should().NotBe(wrongPostalcodeCountry.Format);
+                getResponse[0].PostalCode.Regex.Should().NotBe(wrongPostalcodeCountry.Regex);
+
+                foreach (var currency in values)
+                {
+                    JsonObject valueCurrency = (JsonObject)currency.Value;
+
+                    foreach (var key in wrongValuesCurrency.Keys)
+                    {
+                        if (valueCurrency.ContainsKey(key))
+                        {
+                            wrongValuesCurrency[key].Should().NotBe((string)valueCurrency[key]);
+                        }
+                    }
+                }
+                    
+
+            }
+            #endregion
+        }
+
     }
 }
 
