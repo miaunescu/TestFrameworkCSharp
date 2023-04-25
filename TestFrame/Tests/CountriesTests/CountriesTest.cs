@@ -510,12 +510,9 @@ namespace TestFrame.Tests.CountriesTest
                         }
                     }
                 }
-                    
-
             }
             #endregion
         }
-
     }
 }
 
