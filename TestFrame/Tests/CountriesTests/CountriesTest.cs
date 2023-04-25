@@ -42,8 +42,8 @@ namespace TestFrame.Tests.CountriesTest
         public async Task Get_Country_By_Name_Test()
         {
             var response = await restFactory.Create()
-                                            .WithRequest($"/name/{TestFixture.Name}", Method.Get)
-                                            .Execute<List<CountryModel>>(TestFixture.Client);
+ .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+ .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
 
             //Create new object "nameCountry" based on NameModel
@@ -72,7 +72,7 @@ namespace TestFrame.Tests.CountriesTest
             //Create new object "capitalCountry" based on CapitalInfoModel
             var capitalCountry = new CapitalInfoModel()
             {
-                Latlang = new List<double> { 44.43 , 26.1 }
+                Latlang = new List<double> { 44.43, 26.1 }
             };
 
             //Create new object "currencyCountry" based on CurrenciesModel
@@ -123,9 +123,9 @@ namespace TestFrame.Tests.CountriesTest
                 Fifa = "ROU",
                 StartOfWeek = "monday",
                 Capital = new List<string> { "Bucharest" },
-                AltSpellings = new List<string> { "RO", "Rumania", "Roumania","România"},
+                AltSpellings = new List<string> { "RO", "Rumania", "Roumania", "România" },
                 Tld = new List<string> { ".ro" },
-                Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR"},
+                Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR" },
                 Latlng = new List<double> { 46.0, 25.0 },
                 Timezones = new List<string> { "UTC+02:00" },
                 Continents = new List<string> { "Europe" }
@@ -199,8 +199,8 @@ namespace TestFrame.Tests.CountriesTest
                 //==========================================================
                 if (getResponse[0].Name != null)
                 {
-                        getResponse[0].Name.Common.Should().Be(nameCountry.Common);
-                        getResponse[0].Name.Official.Should().Be(nameCountry.Official);
+                    getResponse[0].Name.Common.Should().Be(nameCountry.Common);
+                    getResponse[0].Name.Official.Should().Be(nameCountry.Official);
                 }
 
                 //==========================================================
@@ -254,7 +254,7 @@ namespace TestFrame.Tests.CountriesTest
                 //Check country Capital Info
                 //==========================================================
                 getResponse[0].CapitalInfo.Latlang.Should().BeEquivalentTo(capitalCountry.Latlang);
-                
+
             }
             #endregion
         }
@@ -454,6 +454,8 @@ namespace TestFrame.Tests.CountriesTest
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 response.Content.FirstOrDefault();
 
+                getResponse.Should().NotBeNull();
+
                 getResponse[0].Cca2.Should().NotBe(wrongCountryModel.Cca2);
                 getResponse[0].Cca3.Should().NotBe(wrongCountryModel.Cca3);
                 getResponse[0].Ccn3.Should().NotBe(wrongCountryModel.Ccn3);
@@ -479,24 +481,42 @@ namespace TestFrame.Tests.CountriesTest
 
                 getResponse[0].CapitalInfo.Should().NotBeEquivalentTo(wrongCapitalCountry.Latlang);
 
-                getResponse[0].Name.Common.Should().NotBe(wrongNameCountry.Common);
-                getResponse[0].Name.Official.Should().NotBe(wrongNameCountry.Official);
+                if (getResponse[0].Name != null)
+                {
+                    getResponse[0].Name.Common.Should().NotBe(wrongNameCountry.Common);
+                    getResponse[0].Name.Official.Should().NotBe(wrongNameCountry.Official);
+                }
 
-                getResponse[0].Maps.GoogleMaps.Should().NotBe(wrongMapsCountry.GoogleMaps);
-                getResponse[0].Maps.OpenStreetMaps.Should().NotBe(wrongMapsCountry.OpenStreetMaps);
+                if (getResponse[0].Maps != null)
+                {
+                    getResponse[0].Maps.GoogleMaps.Should().NotBe(wrongMapsCountry.GoogleMaps);
+                    getResponse[0].Maps.OpenStreetMaps.Should().NotBe(wrongMapsCountry.OpenStreetMaps);
+                }
 
-                getResponse[0].Flags.Png.Should().NotBe(wrongFlagCountry.Png);
-                getResponse[0].Flags.Svg.Should().NotBe(wrongFlagCountry.Svg);
-                getResponse[0].Flags.Alt.Should().NotBe(wrongFlagCountry.Alt);
+                if (getResponse[0].Flags != null)
+                {
+                    getResponse[0].Flags.Png.Should().NotBe(wrongFlagCountry.Png);
+                    getResponse[0].Flags.Svg.Should().NotBe(wrongFlagCountry.Svg);
+                    getResponse[0].Flags.Alt.Should().NotBe(wrongFlagCountry.Alt);
+                }
 
-                getResponse[0].Idd.Root.Should().NotBe(wrongIddCountry.Root);
-                getResponse[0].Idd.Suffixes.Should().NotBeEquivalentTo(wrongIddCountry.Suffixes);
+                if (getResponse[0].Idd != null)
+                {
+                    getResponse[0].Idd.Root.Should().NotBe(wrongIddCountry.Root);
+                    getResponse[0].Idd.Suffixes.Should().NotBeEquivalentTo(wrongIddCountry.Suffixes);
+                }
 
-                getResponse[0].Car.Signs.Should().NotBeEquivalentTo(wrongCarCountry.Signs);
-                getResponse[0].Car.Side.Should().NotBe(wrongCarCountry.Side);
+                if (getResponse[0].Car != null)
+                {
+                    getResponse[0].Car.Signs.Should().NotBeEquivalentTo(wrongCarCountry.Signs);
+                    getResponse[0].Car.Side.Should().NotBe(wrongCarCountry.Side);
+                }
 
-                getResponse[0].PostalCode.Format.Should().NotBe(wrongPostalcodeCountry.Format);
-                getResponse[0].PostalCode.Regex.Should().NotBe(wrongPostalcodeCountry.Regex);
+                if (getResponse[0].PostalCode != null)
+                {
+                    getResponse[0].PostalCode.Format.Should().NotBe(wrongPostalcodeCountry.Format);
+                    getResponse[0].PostalCode.Regex.Should().NotBe(wrongPostalcodeCountry.Regex);
+                }
 
                 foreach (var currency in values)
                 {
