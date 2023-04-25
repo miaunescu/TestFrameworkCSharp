@@ -5,7 +5,7 @@ namespace TestFrame.Models.PetsModels
     public class GetPetModel
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public Int64 Id { get; set; }
 
         [JsonPropertyName("category")]
         public CategoryModel Category { get; set; }
