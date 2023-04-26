@@ -18,5 +18,11 @@ namespace TestFrame.Models.CatsModels
 
         [JsonPropertyName("pattern")]
         public string Pattern { get; set; }
+
+        [JsonPropertyName("fact")]
+        public string Fact { get; set; }
+
+        [JsonPropertyName("length")]
+        public int Length { get; set; }
     }
 }
