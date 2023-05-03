@@ -42,8 +42,8 @@ namespace TestFrame.Tests.CountriesTest
         public async Task Get_Country_By_Name_Test()
         {
             var response = await restFactory.Create()
- .WithRequest($"/name/{TestFixture.Name}", Method.Get)
- .Execute<List<CountryModel>>(TestFixture.Client);
+                 .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+                 .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
 
             //Create new object "nameCountry" based on NameModel
@@ -130,18 +130,6 @@ namespace TestFrame.Tests.CountriesTest
                 Timezones = new List<string> { "UTC+02:00" },
                 Continents = new List<string> { "Europe" }
             };
-
-
-            //[JsonPropertyName("currencies")]
-            //public CurrenciesModel Currencies { get; set; }
-
-            //[JsonPropertyName("capitalInfo")]
-            //public CapitalInfoModel CapitalInfo { get; set; }
-
-
-            //[JsonPropertyName("demonyms")]
-            //public DemonymsModel Demonyms { get; set; }
-
 
             #region Asserts
             using (new AssertionScope())
