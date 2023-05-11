@@ -17,6 +17,8 @@ using Xunit.Abstractions;
 using TestFrame;
 using FluentAssertions.Equivalency;
 using System.Text.Json.Nodes;
+using RabbitMQ.Client;
+using System.Text;
 
 namespace TestFrame.Tests.CountriesTest
 {
@@ -24,6 +26,8 @@ namespace TestFrame.Tests.CountriesTest
     {
         private RestBuilder restBuilder = new RestBuilder();
         private RestFactory restFactory;
+
+        public string messagebody;
 
         public CountriesTest(CountriesTestFixtures testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
         {
@@ -34,6 +38,32 @@ namespace TestFrame.Tests.CountriesTest
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
             restFactory = new RestFactory(restBuilder);
         }
+
+        public void ProducerTest()
+        {
+            var factoryProducer = new ConnectionFactory { HostName = config.GetSection("CountriesTestData")["HostName"], Port = int.Parse(config.GetSection("CountriesTestData")["Port"]) };
+            using var connectionProducer = factoryProducer.CreateConnection();
+            using var channelProducer = connectionProducer.CreateModel();
+
+            channelProducer.QueueDeclare(queue: "RestCountries",
+                                 durable: false,
+                                 exclusive: false,
+                                 autoDelete: false,
+                                 arguments: null);
+
+            const string message = "Romania";
+            var body = Encoding.UTF8.GetBytes(messagebody);
+
+            channelProducer.BasicPublish(exchange: string.Empty,
+                                 routingKey: "RestCountries",
+                                 basicProperties: null,
+                                 body: body);
+            Console.WriteLine($" [x] Sent {body}");
+
+            Console.WriteLine(" Press [enter] to exit.");
+            Console.ReadLine();
+        }
+
 
         //=============
         //   Test 1
@@ -52,7 +82,6 @@ namespace TestFrame.Tests.CountriesTest
                 Common = "Romania",
                 Official = "Romania"
             };
-
 
             //Create new object "iddCountry" based on IddModel
             var iddCountry = new IddModel()
@@ -130,6 +159,9 @@ namespace TestFrame.Tests.CountriesTest
                 Timezones = new List<string> { "UTC+02:00" },
                 Continents = new List<string> { "Europe" }
             };
+
+            messagebody = JsonConvert.SerializeObject(createCountryModel);
+            ProducerTest();
 
             #region Asserts
             using (new AssertionScope())

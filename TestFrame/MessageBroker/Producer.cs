@@ -1,5 +1,12 @@
-﻿//using System.Text;
+﻿using System.Text;
+using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.Hosting;
 //using RabbitMQ.Client;
+//using TestFrame;
+//using TestFrame.Base;
+//using TestFrame.Builder;
+//using TestFrame.Fixtures;
+
 
 //var factoryProducer = new ConnectionFactory { HostName = "35.158.22.93", Port = 5672 };
 //using var connectionProducer = factoryProducer.CreateConnection();
