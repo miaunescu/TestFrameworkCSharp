@@ -50,7 +50,7 @@ namespace TestFrame.Tests.CountriesTest
             restFactory = new RestFactory(restBuilder);
         }
 
-        internal void RabbitMQManagerProducer()
+        internal void PublishMessage()
         {
             var body = Encoding.UTF8.GetBytes(messagebody);
             rabbitMQManager.PublishMessage(exchange, routingKey, basicProperties, body);
@@ -223,7 +223,7 @@ namespace TestFrame.Tests.CountriesTest
 
             //producer RabbitMQ
             messagebody = JsonConvert.SerializeObject(complexObject);
-            RabbitMQManagerProducer();
+            PublishMessage();
             //StartConsumer();
             //StopConsumer();
 
