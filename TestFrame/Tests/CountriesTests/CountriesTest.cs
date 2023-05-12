@@ -19,6 +19,8 @@ using FluentAssertions.Equivalency;
 using System.Text.Json.Nodes;
 using RabbitMQ.Client;
 using System.Text;
+using TestFrame.MessageBroker;
+using Microsoft.Extensions.Configuration;
 
 namespace TestFrame.Tests.CountriesTest
 {
@@ -27,11 +29,20 @@ namespace TestFrame.Tests.CountriesTest
         private RestBuilder restBuilder = new RestBuilder();
         private RestFactory restFactory;
 
-        public string messagebody;
+        //general for Queue
+        private static string messagebody; //message for RabbitMq - the object is put here
+        private string exchange = string.Empty;
+        private string routingKey = "RestCountries";
+        private string queueName = "RestCountries";
+        IBasicProperties basicProperties = null;
+
+        //general RabbitMQ
+        private static IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "config")).AddJsonFile("appsettings.json").Build();
+        RabbitMQManager rabbitMQManager = new RabbitMQManager(configuration);
+
 
         public CountriesTest(CountriesTestFixtures testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
         {
-
             var api = config.GetSection("CountriesTestData")["CountriesApiUri"];
             TestFixture.Name = config.GetSection("CountriesTestData")["Name"];
             TestFixture.Api = api;
@@ -39,31 +50,21 @@ namespace TestFrame.Tests.CountriesTest
             restFactory = new RestFactory(restBuilder);
         }
 
-        public void ProducerTest()
+        internal void RabbitMQManagerProducer()
         {
-            var factoryProducer = new ConnectionFactory { HostName = config.GetSection("CountriesTestData")["HostName"], Port = int.Parse(config.GetSection("CountriesTestData")["Port"]) };
-            using var connectionProducer = factoryProducer.CreateConnection();
-            using var channelProducer = connectionProducer.CreateModel();
-
-            channelProducer.QueueDeclare(queue: "RestCountries",
-                                 durable: false,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
-
-            const string message = "Romania";
             var body = Encoding.UTF8.GetBytes(messagebody);
-
-            channelProducer.BasicPublish(exchange: string.Empty,
-                                 routingKey: "RestCountries",
-                                 basicProperties: null,
-                                 body: body);
-            Console.WriteLine($" [x] Sent {body}");
-
-            Console.WriteLine(" Press [enter] to exit.");
-            Console.ReadLine();
+            rabbitMQManager.PublishMessage(exchange, routingKey, basicProperties, body);
         }
 
+        internal void StartConsumer()
+        {
+            var body = Encoding.UTF8.GetBytes(messagebody);
+            rabbitMQManager.ConsumeMessage(body, queueName, true);
+        }
+        internal void StopConsumer()
+        {
+            rabbitMQManager.StopConsumer();
+        }
 
         //=============
         //   Test 1
@@ -75,6 +76,67 @@ namespace TestFrame.Tests.CountriesTest
                  .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                  .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
+
+            var complexObject = new CountryModel()
+            {
+                Name = new NameModel()
+                {
+                    Common = "Romania",
+                    Official = "Romania"
+                },
+                Idd = new IddModel()
+                {
+                    Root = "+4",
+                    Suffixes = new List<string> { "0" }
+                },
+                Car = new CarModel()
+                {
+                    Signs = new List<string> { "RO" },
+                    Side = "right"
+                },
+                CapitalInfo = new CapitalInfoModel()
+                {
+                    Latlang = new List<double> { 44.43, 26.1 }
+                },
+                PostalCode = new PostalCodeModel()
+                {
+                    Format = "######",
+                    Regex = "^(\\d{6})$"
+                },
+                Maps = new MapsModel()
+                {
+                    GoogleMaps = "https://goo.gl/maps/845hAgCf1mDkN3vr7",
+                    OpenStreetMaps = "https://www.openstreetmap.org/relation/90689"
+                },
+                Flags = new FlagsModel()
+                {
+                    Png = "https://flagcdn.com/w320/ro.png",
+                    Svg = "https://flagcdn.com/ro.svg",
+                    Alt = "The flag of Romania is composed of three equal vertical bands of navy blue, yellow and red."
+                },
+                Cca2 = "RO",
+                Cca3 = "ROU",
+                Ccn3 = "642",
+                Cioc = "ROU",
+                Independent = true,
+                Status = "officially-assigned",
+                UnMember = true,
+                Region = "Europe",
+                SubRegion = "Southeast Europe",
+                Landlocked = false,
+                Area = 238391,
+                Flag = "🇷🇴",
+                Population = 19286123,
+                Fifa = "ROU",
+                StartOfWeek = "monday",
+                Capital = new List<string> { "Bucharest" },
+                AltSpellings = new List<string> { "RO", "Rumania", "Roumania", "România" },
+                Tld = new List<string> { ".ro" },
+                Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR" },
+                Latlng = new List<double> { 46.0, 25.0 },
+                Timezones = new List<string> { "UTC+02:00" },
+                Continents = new List<string> { "Europe" },
+            };
 
             //Create new object "nameCountry" based on NameModel
             var nameCountry = new NameModel()
@@ -89,7 +151,6 @@ namespace TestFrame.Tests.CountriesTest
                 Root = "+4",
                 Suffixes = new List<string> { "0" }
             };
-
 
             //Create new object "carCountry" based on CarModel
             var carCountry = new CarModel()
@@ -157,11 +218,14 @@ namespace TestFrame.Tests.CountriesTest
                 Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR" },
                 Latlng = new List<double> { 46.0, 25.0 },
                 Timezones = new List<string> { "UTC+02:00" },
-                Continents = new List<string> { "Europe" }
+                Continents = new List<string> { "Europe" },
             };
 
-            messagebody = JsonConvert.SerializeObject(createCountryModel);
-            ProducerTest();
+            //producer RabbitMQ
+            messagebody = JsonConvert.SerializeObject(complexObject);
+            RabbitMQManagerProducer();
+            //StartConsumer();
+            //StopConsumer();
 
             #region Asserts
             using (new AssertionScope())
