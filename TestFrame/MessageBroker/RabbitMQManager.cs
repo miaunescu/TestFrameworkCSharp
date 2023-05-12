@@ -11,6 +11,10 @@ namespace TestFrame.MessageBroker
 {
     public class RabbitMQManager
     {
+        private static RabbitMQManager instance;
+        private static IConfiguration configuration;
+        private static object lockObject = new object();
+
         private ConnectionFactory factoryProducer;
         private IConnection connectionProducer;
         private IModel channelProducer;
@@ -45,14 +49,27 @@ namespace TestFrame.MessageBroker
                                  body: body);
         }
 
-        public void ConsumeMessage(byte[] body, string queueName, bool autoAck)
+        public void ConsumeQueue(string queueName, bool autoAck)
         {
             consumer.Received += (model, ea) =>
             {
-                body = ea.Body.ToArray();
+                var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
             };
             channelProducer.BasicConsume(queue: queueName, autoAck: autoAck, consumer: consumer);
+        }
+
+        public void ConsumeMessage(string queueName, bool autoAck)
+        {
+            BasicGetResult result = channelProducer.BasicGet(queueName, autoAck);
+            if (result != null)
+            {
+                channelProducer.BasicAck(result.DeliveryTag, multiple: false);
+            }
+            else
+            {
+                Console.WriteLine("No messages in Queue");
+            }
         }
 
         public void CloseConnection()
@@ -69,6 +86,23 @@ namespace TestFrame.MessageBroker
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
             };
+        }
+
+        public static RabbitMQManager GetInstance(IConfiguration config)
+        {
+            if (instance == null)
+            {
+                lock (lockObject)
+                {
+                    if (instance == null)
+                    {
+                        configuration = config;
+                        instance = new RabbitMQManager(config);
+                    }
+                }
+            }
+
+            return instance;
         }
 
     }

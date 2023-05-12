@@ -38,7 +38,8 @@ namespace TestFrame.Tests.CountriesTest
 
         //general RabbitMQ
         private static IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "config")).AddJsonFile("appsettings.json").Build();
-        RabbitMQManager rabbitMQManager = new RabbitMQManager(configuration);
+        //RabbitMQManager rabbitMQManager = new RabbitMQManager(configuration);
+        RabbitMQManager rabbitMQManager = RabbitMQManager.GetInstance(configuration);
 
 
         public CountriesTest(CountriesTestFixtures testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
@@ -56,11 +57,16 @@ namespace TestFrame.Tests.CountriesTest
             rabbitMQManager.PublishMessage(exchange, routingKey, basicProperties, body);
         }
 
-        internal void StartConsumer()
+        internal void ConsumeMessage()
         {
-            var body = Encoding.UTF8.GetBytes(messagebody);
-            rabbitMQManager.ConsumeMessage(body, queueName, true);
+            rabbitMQManager.ConsumeMessage(queueName, false);
         }
+        
+        internal void ConsumeQueue()
+        {
+            rabbitMQManager.ConsumeQueue(queueName, true);
+        }
+
         internal void StopConsumer()
         {
             rabbitMQManager.StopConsumer();
@@ -224,7 +230,7 @@ namespace TestFrame.Tests.CountriesTest
             //producer RabbitMQ
             messagebody = JsonConvert.SerializeObject(complexObject);
             PublishMessage();
-            //StartConsumer();
+            //ConsumeMessage();
             //StopConsumer();
 
             #region Asserts
@@ -363,6 +369,11 @@ namespace TestFrame.Tests.CountriesTest
                 Latlng = new List<double> { 46.0, 25.0 },
 
             };
+
+            messagebody = JsonConvert.SerializeObject("mesaj");
+            PublishMessage();
+            //ConsumeQueue();
+            //ConsumeMessage();
 
             #region Asserts
             using (new AssertionScope())
