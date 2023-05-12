@@ -38,7 +38,6 @@ namespace TestFrame.Tests.CountriesTest
 
         //general RabbitMQ
         private static IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "config")).AddJsonFile("appsettings.json").Build();
-        //RabbitMQManager rabbitMQManager = new RabbitMQManager(configuration);
         RabbitMQManager rabbitMQManager = RabbitMQManager.GetInstance(configuration);
 
 
