@@ -235,7 +235,7 @@ namespace TestFrame.Tests.CountriesTest
             DeclareQueue();
             messagebody = JsonConvert.SerializeObject(complexObject);
             PublishMessage();
-            ////ConsumeMessage();
+            //ConsumeMessage();
             //ConsumeQueue();
             //StopConsumer(); // works just with ConsumeQueue
 
