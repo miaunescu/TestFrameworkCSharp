@@ -50,6 +50,11 @@ namespace TestFrame.Tests.CountriesTest
             restFactory = new RestFactory(restBuilder);
         }
 
+        internal void DeclareQueue()
+        {
+            rabbitMQManager.DeclareQueue(queueName, false, false, false, null);
+        }
+
         internal void PublishMessage()
         {
             var body = Encoding.UTF8.GetBytes(messagebody);
@@ -227,10 +232,12 @@ namespace TestFrame.Tests.CountriesTest
             };
 
             //producer RabbitMQ
+            DeclareQueue();
             messagebody = JsonConvert.SerializeObject(complexObject);
             PublishMessage();
-            //ConsumeMessage();
-            //StopConsumer();
+            ////ConsumeMessage();
+            //ConsumeQueue();
+            //StopConsumer(); // works just with ConsumeQueue
 
             #region Asserts
             using (new AssertionScope())
