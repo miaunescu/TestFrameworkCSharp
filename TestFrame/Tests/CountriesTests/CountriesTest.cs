@@ -17,6 +17,10 @@ using Xunit.Abstractions;
 using TestFrame;
 using FluentAssertions.Equivalency;
 using System.Text.Json.Nodes;
+using RabbitMQ.Client;
+using System.Text;
+using TestFrame.MessageBroker;
+using Microsoft.Extensions.Configuration;
 
 namespace TestFrame.Tests.CountriesTest
 {
@@ -25,14 +29,51 @@ namespace TestFrame.Tests.CountriesTest
         private RestBuilder restBuilder = new RestBuilder();
         private RestFactory restFactory;
 
+        //general for Queue
+        private static string messagebody; //message for RabbitMq - the object is put here
+        private string exchange = string.Empty;
+        private string routingKey = "RestCountries";
+        private string queueName = "RestCountries";
+        IBasicProperties basicProperties = null;
+
+        //general RabbitMQ
+        private static IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "config")).AddJsonFile("appsettings.json").Build();
+        RabbitMQManager rabbitMQManager = RabbitMQManager.GetInstance(configuration);
+
+
         public CountriesTest(CountriesTestFixtures testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
         {
-
             var api = config.GetSection("CountriesTestData")["CountriesApiUri"];
             TestFixture.Name = config.GetSection("CountriesTestData")["Name"];
             TestFixture.Api = api;
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
             restFactory = new RestFactory(restBuilder);
+        }
+
+        internal void DeclareQueue()
+        {
+            rabbitMQManager.DeclareQueue(queueName, false, false, false, null);
+        }
+
+        internal void PublishMessage()
+        {
+            var body = Encoding.UTF8.GetBytes(messagebody);
+            rabbitMQManager.PublishMessage(exchange, routingKey, basicProperties, body);
+        }
+
+        internal void ConsumeMessage()
+        {
+            rabbitMQManager.ConsumeMessage(queueName, false);
+        }
+        
+        internal void ConsumeQueue()
+        {
+            rabbitMQManager.ConsumeQueue(queueName, true);
+        }
+
+        internal void StopConsumer()
+        {
+            rabbitMQManager.StopConsumer();
         }
 
         //=============
@@ -42,9 +83,70 @@ namespace TestFrame.Tests.CountriesTest
         public async Task Get_Country_By_Name_Test()
         {
             var response = await restFactory.Create()
- .WithRequest($"/name/{TestFixture.Name}", Method.Get)
- .Execute<List<CountryModel>>(TestFixture.Client);
+                 .WithRequest($"/name/{TestFixture.Name}", Method.Get)
+                 .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
+
+            var complexObject = new CountryModel()
+            {
+                Name = new NameModel()
+                {
+                    Common = "Romania",
+                    Official = "Romania"
+                },
+                Idd = new IddModel()
+                {
+                    Root = "+4",
+                    Suffixes = new List<string> { "0" }
+                },
+                Car = new CarModel()
+                {
+                    Signs = new List<string> { "RO" },
+                    Side = "right"
+                },
+                CapitalInfo = new CapitalInfoModel()
+                {
+                    Latlang = new List<double> { 44.43, 26.1 }
+                },
+                PostalCode = new PostalCodeModel()
+                {
+                    Format = "######",
+                    Regex = "^(\\d{6})$"
+                },
+                Maps = new MapsModel()
+                {
+                    GoogleMaps = "https://goo.gl/maps/845hAgCf1mDkN3vr7",
+                    OpenStreetMaps = "https://www.openstreetmap.org/relation/90689"
+                },
+                Flags = new FlagsModel()
+                {
+                    Png = "https://flagcdn.com/w320/ro.png",
+                    Svg = "https://flagcdn.com/ro.svg",
+                    Alt = "The flag of Romania is composed of three equal vertical bands of navy blue, yellow and red."
+                },
+                Cca2 = "RO",
+                Cca3 = "ROU",
+                Ccn3 = "642",
+                Cioc = "ROU",
+                Independent = true,
+                Status = "officially-assigned",
+                UnMember = true,
+                Region = "Europe",
+                SubRegion = "Southeast Europe",
+                Landlocked = false,
+                Area = 238391,
+                Flag = "🇷🇴",
+                Population = 19286123,
+                Fifa = "ROU",
+                StartOfWeek = "monday",
+                Capital = new List<string> { "Bucharest" },
+                AltSpellings = new List<string> { "RO", "Rumania", "Roumania", "România" },
+                Tld = new List<string> { ".ro" },
+                Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR" },
+                Latlng = new List<double> { 46.0, 25.0 },
+                Timezones = new List<string> { "UTC+02:00" },
+                Continents = new List<string> { "Europe" },
+            };
 
             //Create new object "nameCountry" based on NameModel
             var nameCountry = new NameModel()
@@ -53,14 +155,12 @@ namespace TestFrame.Tests.CountriesTest
                 Official = "Romania"
             };
 
-
             //Create new object "iddCountry" based on IddModel
             var iddCountry = new IddModel()
             {
                 Root = "+4",
                 Suffixes = new List<string> { "0" }
             };
-
 
             //Create new object "carCountry" based on CarModel
             var carCountry = new CarModel()
@@ -128,20 +228,16 @@ namespace TestFrame.Tests.CountriesTest
                 Borders = new List<string> { "BGR", "HUN", "MDA", "SRB", "UKR" },
                 Latlng = new List<double> { 46.0, 25.0 },
                 Timezones = new List<string> { "UTC+02:00" },
-                Continents = new List<string> { "Europe" }
+                Continents = new List<string> { "Europe" },
             };
 
-
-            //[JsonPropertyName("currencies")]
-            //public CurrenciesModel Currencies { get; set; }
-
-            //[JsonPropertyName("capitalInfo")]
-            //public CapitalInfoModel CapitalInfo { get; set; }
-
-
-            //[JsonPropertyName("demonyms")]
-            //public DemonymsModel Demonyms { get; set; }
-
+            //producer RabbitMQ
+            DeclareQueue();
+            messagebody = JsonConvert.SerializeObject(complexObject);
+            PublishMessage();
+            //ConsumeMessage();
+            //ConsumeQueue();
+            //StopConsumer(); // works just with ConsumeQueue
 
             #region Asserts
             using (new AssertionScope())
@@ -279,6 +375,11 @@ namespace TestFrame.Tests.CountriesTest
                 Latlng = new List<double> { 46.0, 25.0 },
 
             };
+
+            messagebody = JsonConvert.SerializeObject("mesaj");
+            PublishMessage();
+            //ConsumeQueue();
+            //ConsumeMessage();
 
             #region Asserts
             using (new AssertionScope())
