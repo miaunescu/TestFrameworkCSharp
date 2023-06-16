@@ -1,10 +1,8 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using TestFrame.Databases;
 using TestFrame.Models.Northwind;
 using Xunit;
@@ -12,65 +10,118 @@ using Xunit;
 namespace TestFrame.Tests.NorthwindDatabaseTests
 {
     //You need to start the server 3.70.90.215 before running the tests
-    public class NorthwindCustomersDatabaseTests
+    public class NorthwindCustomersDatabaseTests : BaseDatabasesConfiguration
     {
-        NorthwindDatabase northwindDatabase;
-
-        public NorthwindCustomersDatabaseTests()
+        private readonly IDbClient _dbClient;
+        public NorthwindCustomersDatabaseTests(IDbClient dbClient)
         {
-            northwindDatabase = new();
+            _dbClient = dbClient;
         }
 
         [Fact]
         public void Get_Customers_Northwind_Database_Test()
         {
-            var firstClient = northwindDatabase.GetClients().FirstOrDefault();
+            var firstClient = GetNorthwindCustomers().FirstOrDefault();
 
             using (new AssertionScope())
             {
-                firstClient.CompanyName.Should().Be("Alfreds Futterkiste");
+                firstClient.Should().NotBeNull();
+                firstClient!.CompanyName.Should().Be("Alfreds Futterkiste");
             }
         }
 
         [Fact]
-        public void Add_Customer_Northwind_Database_Test()
+        public async Task Add_Customer_Northwind_Database_Test()
         {
-            NorthwindCustomersModel model = new()
+            var model = new NorthwindCustomersModel()
             {
                 CustomerID = "AUTO1",
+                Address = "Endava County 1 Ave",
+                City = "Bucharest",
                 CompanyName = "AutoCompany1",
                 ContactName = "ContactAuto1",
                 ContactTitle = "ContactTitleAuto1",
-                Address = "Endava County 1 Ave",
-                City = "Bucharest",
-                Region = "Tineretului",
-                PostalCode = "12345",
                 Country = "Romania",
+                Fax = "000-000",
                 Phone = "898989",
-                Fax = "000-000"
+                PostalCode = "12345",
+                Region = "Tineretului"
             };
 
-            var client = northwindDatabase.AddCustomer(model);
+            var queryParameters = new Dictionary<string, object>
+            {
+                ["CustomerID"] = model.CustomerID,
+                ["Address"] = model.Address,
+                ["City"] = model.City,
+                ["CompanyName"] = model.CompanyName,
+                ["ContactName"] = model.ContactName,
+                ["ContactTitle"] = model.ContactTitle,
+                ["Country"] = model.Country,
+                ["Fax"] = model.Fax,
+                ["Phone"] = model.Phone,
+                ["PostalCode"] = model.PostalCode,
+                ["Region"] = model.Region
+            };
+
+            await AddNewCustomerToNorthwindDb(queryParameters);
+
+
+            var newCustomer = await GetNorthwindCustomerById(queryParameters);
 
             using (new AssertionScope())
             {
-                client.Country.Should().Be(model.Country);
-                client.CustomerID.Should().Be(model.CustomerID);
-                client.CompanyName.Should().Be(model.CompanyName);
-                client.ContactName.Should().Be(model.ContactName);
-                client.ContactTitle.Should().Be(model.ContactTitle);
-                client.Address.Should().Be(model.Address);
-                client.City.Should().Be(model.City);
-                client.Region.Should().Be(model.Region);
-                client.PostalCode.Should().Be(model.PostalCode);
-                client.Country.Should().Be(model.Country);
-                client.Phone.Should().Be(model.Phone);
-                client.Fax.Should().Be(model.Fax);
+                newCustomer!.Country.Should().Be(model.Country);
+                newCustomer.CustomerID.Should().Be(model.CustomerID);
+                newCustomer.CompanyName.Should().Be(model.CompanyName);
+                newCustomer.ContactName.Should().Be(model.ContactName);
+                newCustomer.ContactTitle.Should().Be(model.ContactTitle);
+                newCustomer.Address.Should().Be(model.Address);
+                newCustomer.City.Should().Be(model.City);
+                newCustomer.Region.Should().Be(model.Region);
+                newCustomer.PostalCode.Should().Be(model.PostalCode);
+                newCustomer.Country.Should().Be(model.Country);
+                newCustomer.Phone.Should().Be(model.Phone);
+                newCustomer.Fax.Should().Be(model.Fax);
             }
 
             //Delete the customer after creation, to be able to create another one with the same CustomerID
-            northwindDatabase.DeleteCustomer(model.CustomerID);
+            await DeleteNorthwindCustomer(queryParameters);
         }
+
+        #region DbQueries
+        private List<NorthwindCustomersModel> GetNorthwindCustomers()
+        {
+            var query = "SELECT TOP 10 * FROM dbo.Customers";
+            return _dbClient.GetRecordsFromDatabase<NorthwindCustomersModel>(CreateNorthwindConnection(), query);
+        }
+
+        private async Task AddNewCustomerToNorthwindDb(Dictionary<string, object> parameters)
+        {
+            var query =
+                "INSERT INTO dbo.Customers(CustomerID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone, Fax)" +
+                "VALUES (@CustomerID, @CompanyName, @ContactName, @ContactTitle, @Address, @City, @Region, @PostalCode, @Country, @Phone, @Fax);";
+
+            await _dbClient.AddRecordToDatabase(CreateNorthwindConnection(), query, parameters);
+        }
+
+        private async Task DeleteNorthwindCustomer(Dictionary<string, object> parameters)
+        {
+            var query = "DELETE FROM dbo.Customers where CustomerID = @CustomerID";
+            await _dbClient.DeleteRecordFromDatabaseAsync(CreateNorthwindConnection(), parameters, query);
+        }
+
+        private async Task<NorthwindCustomersModel> GetNorthwindCustomerById(Dictionary<string, object> parameters)
+        {
+            var query = "SELECT * FROM dbo.Customers WHERE CustomerID = @CustomerID";
+            return await _dbClient.GetOneRecordFromDatabaseAsync<NorthwindCustomersModel>(CreateNorthwindConnection(), query, parameters);
+        }
+
+        protected IDbConnection CreateNorthwindConnection()
+        {
+            var sqlConnection = new SqlConnection(config?.GetConnectionString("Northwind"));
+            return sqlConnection;
+        }
+        #endregion
     }
 }
 

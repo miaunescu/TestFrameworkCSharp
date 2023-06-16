@@ -3,17 +3,9 @@ using FluentAssertions.Execution;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using RestSharp.Authenticators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using TestFrame.Base;
-using TestFrame.Builder;
 using TestFrame.Fixtures;
-using TestFrame.Models;
 using TestFrame.Models.PetsModels;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,19 +15,17 @@ namespace TestFrame.Tests.PetsTests
     public class PetsTests : OrderedAcceptanceTestsBase<PetsTestFixture>
 
     {
-        
-
+        private const string _petsTestData = "PetsTestData";
         public PetsTests(PetsTestFixture testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
         {
-            var api = config.GetSection("PetsTestData")["PetstoreApiUri"];
-            TestFixture.PetID = int.Parse(config.GetSection("PetsTestData")["PetID"]);
-            TestFixture.InvalidID = int.Parse(config.GetSection("PetsTestData")["InvalidID"]);
+            var api = config.GetSection(_petsTestData)["PetstoreApiUri"];
+            TestFixture.PetID = int.Parse(config.GetSection(_petsTestData)["PetID"]!);
+            TestFixture.InvalidID = int.Parse(config.GetSection(_petsTestData)["InvalidID"]!);
             TestFixture.Api = api;
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
         }
 
         //Get 
-
         [Fact, TestPriority(1)]
         public async Task Get_Pet_By_Id_Test()
         {
@@ -43,18 +33,20 @@ namespace TestFrame.Tests.PetsTests
 
             var response = await TestFixture.Client.ExecuteAsync(request);
 
-            var reponseContent = JsonConvert.DeserializeObject(response.Content) as JObject;
-            var categoryProperty = reponseContent.GetValue("category");
-            var categoryResponse = categoryProperty.ToObject<CategoryModel>();
+            var responseContent = JsonConvert.DeserializeObject(response.Content) as JObject;
+            var categoryProperty = responseContent?.GetValue("category");
+            var categoryResponse = categoryProperty?.ToObject<CategoryModel>();
 
             var responseGetPet = response.Content;
 
             #region Asserts
             using (new AssertionScope())
             {
+                response.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
-                categoryResponse.Id.Should().Be(TestFixture.PetID);
+                response.Content.Should().NotBeNull();
+
+                categoryResponse!.Id.Should().Be(TestFixture.PetID);
                 responseGetPet.Should().NotBeNull();
             }
             #endregion
@@ -67,14 +59,13 @@ namespace TestFrame.Tests.PetsTests
 
             var response = await TestFixture.Client.ExecuteAsync(request);
 
-            ErrorResponse responseError = JsonConvert.DeserializeObject<ErrorResponse>(response.Content);
-            Assert.True(responseError.Message == "Pet not found");
+            var responseError = JsonConvert.DeserializeObject<ErrorResponse>(response.Content);
 
             #region Asserts
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-                
+                responseError.Message.Should().Be("Pet not found");
             }
             #endregion
         }
@@ -95,7 +86,9 @@ namespace TestFrame.Tests.PetsTests
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
+                response.Should().NotBeNull();
+
+                response.Content!.Should().NotBeNullOrEmpty();
                 responseGetPet.Should().NotBeNull();
             }
             #endregion
@@ -107,44 +100,43 @@ namespace TestFrame.Tests.PetsTests
         {
             var request = new RestRequest($"/v2/pet", Method.Post);
 
-            GetPetModel monkey = new GetPetModel();
+            var monkey = new GetPetModel()
+            {
+                Category = new CategoryModel()
+                {
+                    Name = "Sisi"
+                },
 
-            monkey.Category = new CategoryModel();
-            monkey.Category.Name = "Sisi";
-            monkey.Name = "Monkey";
-            monkey.Status = "Available";
+                Name = "Monkey",
+                Status = "Available"
+            };
 
             request.AddJsonBody(monkey);
 
             var response = await TestFixture.Client.ExecuteAsync(request);
 
-            var reponseContent = JsonConvert.DeserializeObject(response.Content) as JObject;
-            var categoryProperty = reponseContent.GetValue("category");
+            var responseContent = JsonConvert.DeserializeObject(response.Content) as JObject;
+            var categoryProperty = responseContent!.GetValue("category");
             var categoryResponse = categoryProperty.ToObject<CategoryModel>();
-            
+
             var responseGetPet = response.Content;
 
-            GetPetModel responsePet = JsonConvert.DeserializeObject<GetPetModel>(response.Content);
-
-            Assert.NotNull(responsePet);
-            Assert.NotEqual(0,responsePet.Id);
-            Assert.NotNull(responsePet.Name);
-            Assert.Equal(monkey.Name, responsePet.Name);
-            Assert.NotNull(responsePet.Status);
-            Assert.Equal(monkey.Status, responsePet.Status);
-
+            var responsePet = JsonConvert.DeserializeObject<GetPetModel>(response.Content);
             this.TestFixture.Id = responsePet.Id;
 
-            #region Asserts
             using (new AssertionScope())
             {
+                response.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
+
+                responsePet.Should().NotBeNull();
                 responseGetPet.Should().NotBeNull();
-                
-                
+                responsePet.Name.Should().NotBeNull();
+                responsePet.Id.Should().BeGreaterThan(0);
+
+                responsePet.Name.Should().Be(monkey.Name);
+                responsePet.Status.Should().Be(monkey.Status);
             }
-            #endregion
         }
 
         [Fact, TestPriority(3)]
@@ -152,44 +144,41 @@ namespace TestFrame.Tests.PetsTests
         {
             var request = new RestRequest($"/v2/pet", Method.Put);
 
-            GetPetModel monkey = new GetPetModel();
+            var monkey = new GetPetModel()
+            {
+                Category = new CategoryModel()
+                {
+                    Name = "Sisi - updated"
+                },
 
-            monkey.Category = new CategoryModel();
-            monkey.Category.Name = "Sisi - updated";
-            monkey.Name = "Monkey";
-            monkey.Status = "pending";
+                Name = "Monkey",
+                Status = "pending"
+            };
 
             request.AddJsonBody(monkey);
 
             var response = await TestFixture.Client.ExecuteAsync(request);
 
-            var reponseContent = JsonConvert.DeserializeObject(response.Content) as JObject;
-            var categoryProperty = reponseContent.GetValue("category");
-            var categoryResponse = categoryProperty.ToObject<CategoryModel>();
+            var responseContent = JsonConvert.DeserializeObject(response.Content) as JObject;
+            var categoryProperty = responseContent!.GetValue("category");
 
             var responseGetPet = response.Content;
 
-            GetPetModel responsePet = JsonConvert.DeserializeObject<GetPetModel>(response.Content);
+            var responsePet = JsonConvert.DeserializeObject<GetPetModel>(response.Content);
 
-            Assert.NotNull(responsePet);
-            Assert.NotEqual(0, responsePet.Id);
-            Assert.NotNull(responsePet.Name);
-            Assert.Equal(monkey.Name, responsePet.Name);
-            Assert.NotNull(responsePet.Status);
-            Assert.Equal(monkey.Status, responsePet.Status);
+            TestFixture.Id = responsePet.Id;
 
-            this.TestFixture.Id = responsePet.Id;
-
-            #region Asserts
             using (new AssertionScope())
             {
+                response.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
-                responseGetPet.Should().NotBeNull();
 
-
+                responsePet.Should().NotBeNull();
+                responsePet.Name.Should().NotBeNull();
+                responsePet.Status.Should().NotBeNull();
+                responsePet.Id.Should().BeGreaterThan(0);
+                responsePet.Status.Should().Be(monkey.Status);
             }
-            #endregion
         }
 
         [Fact, TestPriority(4)]
@@ -200,7 +189,6 @@ namespace TestFrame.Tests.PetsTests
             request.AddQueryParameter("name", "Sisi");
             request.AddQueryParameter("status", "sold");
 
-
             var response = await TestFixture.Client.ExecuteAsync(request);
 
             var responseGetPet = response.Content;
@@ -209,10 +197,8 @@ namespace TestFrame.Tests.PetsTests
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
+                response.Should().NotBeNull();
                 responseGetPet.Should().NotBeNull();
-
-
             }
             #endregion
         }
@@ -232,7 +218,6 @@ namespace TestFrame.Tests.PetsTests
             #endregion
         }
 
-
         [Fact, TestPriority(6)]
         public async Task Delete_Pet_By_InvalidId_Test()
         {
@@ -247,7 +232,5 @@ namespace TestFrame.Tests.PetsTests
             }
             #endregion
         }
-
-
     }
 }

@@ -1,34 +1,27 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using RabbitMQ.Client;
 using RestSharp;
 using System.Net;
-using System.Security.Authentication;
+using System.Text;
+using System.Text.Json.Nodes;
 using TestFrame.Base;
 using TestFrame.Builder;
 using TestFrame.Fixtures;
-using TestFrame.Models.CatsModels;
+using TestFrame.MessageBroker;
 using TestFrame.Models.CountriesModels;
-using TestFrame.Models.PetsModels;
 using Xunit;
 using Xunit.Abstractions;
-using TestFrame;
-using FluentAssertions.Equivalency;
-using System.Text.Json.Nodes;
-using RabbitMQ.Client;
-using System.Text;
-using TestFrame.MessageBroker;
-using Microsoft.Extensions.Configuration;
 
-namespace TestFrame.Tests.CountriesTest
+namespace TestFrame.Tests.CountriesTests
 {
     public class CountriesTest : OrderedAcceptanceTestsBase<CountriesTestFixtures>
     {
-        private RestBuilder restBuilder = new RestBuilder();
-        private RestFactory restFactory;
+        private readonly IRestBuilder _restBuilder;
 
+        private const string _countriesTestData = "CountriesTestData";
         //general for Queue
         private static string messagebody; //message for RabbitMq - the object is put here
         private string exchange = string.Empty;
@@ -41,13 +34,13 @@ namespace TestFrame.Tests.CountriesTest
         RabbitMQManager rabbitMQManager = RabbitMQManager.GetInstance(configuration);
 
 
-        public CountriesTest(CountriesTestFixtures testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
+        public CountriesTest(CountriesTestFixtures testFixture, ITestOutputHelper outputHelper, IRestBuilder restBuilder) : base(testFixture, outputHelper)
         {
-            var api = config.GetSection("CountriesTestData")["CountriesApiUri"];
-            TestFixture.Name = config.GetSection("CountriesTestData")["Name"];
+            var api = config.GetSection(_countriesTestData)["CountriesApiUri"];
+            TestFixture.Name = config.GetSection(_countriesTestData)["Name"];
             TestFixture.Api = api;
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
-            restFactory = new RestFactory(restBuilder);
+            _restBuilder = restBuilder;
         }
 
         internal void DeclareQueue()
@@ -65,7 +58,7 @@ namespace TestFrame.Tests.CountriesTest
         {
             rabbitMQManager.ConsumeMessage(queueName, false);
         }
-        
+
         internal void ConsumeQueue()
         {
             rabbitMQManager.ConsumeQueue(queueName, true);
@@ -82,7 +75,7 @@ namespace TestFrame.Tests.CountriesTest
         [Fact, TestPriority(1)]
         public async Task Get_Country_By_Name_Test()
         {
-            var response = await restFactory.Create()
+            var response = await _restBuilder.Create()
                  .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                  .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
@@ -94,36 +87,43 @@ namespace TestFrame.Tests.CountriesTest
                     Common = "Romania",
                     Official = "Romania"
                 },
+
                 Idd = new IddModel()
                 {
                     Root = "+4",
                     Suffixes = new List<string> { "0" }
                 },
+
                 Car = new CarModel()
                 {
                     Signs = new List<string> { "RO" },
                     Side = "right"
                 },
+
                 CapitalInfo = new CapitalInfoModel()
                 {
                     Latlang = new List<double> { 44.43, 26.1 }
                 },
+
                 PostalCode = new PostalCodeModel()
                 {
                     Format = "######",
                     Regex = "^(\\d{6})$"
                 },
+
                 Maps = new MapsModel()
                 {
                     GoogleMaps = "https://goo.gl/maps/845hAgCf1mDkN3vr7",
                     OpenStreetMaps = "https://www.openstreetmap.org/relation/90689"
                 },
+
                 Flags = new FlagsModel()
                 {
                     Png = "https://flagcdn.com/w320/ro.png",
                     Svg = "https://flagcdn.com/ro.svg",
                     Alt = "The flag of Romania is composed of three equal vertical bands of navy blue, yellow and red."
                 },
+
                 Cca2 = "RO",
                 Cca3 = "ROU",
                 Ccn3 = "642",
@@ -148,54 +148,46 @@ namespace TestFrame.Tests.CountriesTest
                 Continents = new List<string> { "Europe" },
             };
 
-            //Create new object "nameCountry" based on NameModel
             var nameCountry = new NameModel()
             {
                 Common = "Romania",
                 Official = "Romania"
             };
 
-            //Create new object "iddCountry" based on IddModel
             var iddCountry = new IddModel()
             {
                 Root = "+4",
                 Suffixes = new List<string> { "0" }
             };
 
-            //Create new object "carCountry" based on CarModel
             var carCountry = new CarModel()
             {
                 Signs = new List<string> { "RO" },
                 Side = "right"
             };
 
-            //Create new object "capitalCountry" based on CapitalInfoModel
             var capitalCountry = new CapitalInfoModel()
             {
                 Latlang = new List<double> { 44.43, 26.1 }
             };
 
-            //Create new object "currencyCountry" based on CurrenciesModel
             var currencyCountry = new CurrenciesModel()
             {
                 //Currency = { "RON" }   
             };
 
-            //Create new object "postalcodeCountry" based on PostalCodeModel
             var postalcodeCountry = new PostalCodeModel()
             {
                 Format = "######",
                 Regex = "^(\\d{6})$"
             };
 
-            //Create new object "maspCountry" based on MapsModel
             var mapsCountry = new MapsModel()
             {
                 GoogleMaps = "https://goo.gl/maps/845hAgCf1mDkN3vr7",
                 OpenStreetMaps = "https://www.openstreetmap.org/relation/90689"
             };
 
-            //Create new object "flagCountry" based on FlagsModel
             var flagCountry = new FlagsModel()
             {
                 Png = "https://flagcdn.com/w320/ro.png",
@@ -203,8 +195,6 @@ namespace TestFrame.Tests.CountriesTest
                 Alt = "The flag of Romania is composed of three equal vertical bands of navy blue, yellow and red."
             };
 
-
-            //Create new object "createCountryModel" based on CountryModel
             var createCountryModel = new CountryModel()
             {
                 Cca2 = "RO",
@@ -242,29 +232,11 @@ namespace TestFrame.Tests.CountriesTest
             #region Asserts
             using (new AssertionScope())
             {
-
-                //==========================================================
-                //Check HTTP status code
-                //==========================================================
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 response.Content.FirstOrDefault();
 
-
-                //==========================================================
-                //Check object is not null
-                //==========================================================
                 getResponse.Should().NotBeNull();
 
-
-                //==========================================================
-                //Check country list of codes
-                //Check country independence, status, unmember
-                //Check country region, subregion
-                //Check country landlocked, area, flag
-                //Check country population, fifa, start of week
-                //Check country capital, altspecllings, tld
-                //Check country borders, latlng, timezones, continents
-                //==========================================================
                 getResponse[0].Cca2.Should().Be(createCountryModel.Cca2);
                 getResponse[0].Cca3.Should().Be(createCountryModel.Cca3);
                 getResponse[0].Ccn3.Should().Be(createCountryModel.Ccn3);
@@ -288,30 +260,18 @@ namespace TestFrame.Tests.CountriesTest
                 getResponse[0].Timezones.Should().BeEquivalentTo(createCountryModel.Timezones);
                 getResponse[0].Continents.Should().BeEquivalentTo(createCountryModel.Continents);
 
-                //==========================================================
-                //Check country name - Common and Official
-                //Null check for Name before checking common
-                //Check the object is not Null
-                //==========================================================
                 if (getResponse[0].Name != null)
                 {
                     getResponse[0].Name.Common.Should().Be(nameCountry.Common);
                     getResponse[0].Name.Official.Should().Be(nameCountry.Official);
                 }
 
-                //==========================================================
-                //Check country map - Google and Open Street
-                //Check the object is not Null
-                //==========================================================
                 if (getResponse[0].Maps != null)
                 {
                     getResponse[0].Maps.GoogleMaps.Should().Be(mapsCountry.GoogleMaps);
                     getResponse[0].Maps.OpenStreetMaps.Should().Be(mapsCountry.OpenStreetMaps);
                 }
 
-                //==========================================================
-                //Check country flags
-                //==========================================================
                 if (getResponse[0].Flags != null)
                 {
                     getResponse[0].Flags.Png.Should().Be(flagCountry.Png);
@@ -319,42 +279,28 @@ namespace TestFrame.Tests.CountriesTest
                     getResponse[0].Flags.Alt.Should().Be(flagCountry.Alt);
                 }
 
-                //==========================================================
-                //Check country Idd - Root and Suffixes
-                //==========================================================
                 if (getResponse[0].Idd != null)
                 {
                     getResponse[0].Idd.Root.Should().Be(iddCountry.Root);
                     getResponse[0].Idd.Suffixes.Should().BeEquivalentTo(iddCountry.Suffixes);
                 }
 
-                //==========================================================
-                //Check country Car - Signs and Car
-                //==========================================================
                 if (getResponse[0].Car != null)
                 {
                     getResponse[0].Car.Signs.Should().BeEquivalentTo(carCountry.Signs);
                     getResponse[0].Car.Side.Should().Be(carCountry.Side);
                 }
 
-                //==========================================================
-                //Check country Postal Code - Format and Regex
-                //==========================================================
                 if (getResponse[0].PostalCode != null)
                 {
                     getResponse[0].PostalCode.Format.Should().Be(postalcodeCountry.Format);
                     getResponse[0].PostalCode.Regex.Should().Be(postalcodeCountry.Regex);
                 }
 
-                //==========================================================
-                //Check country Capital Info
-                //==========================================================
                 getResponse[0].CapitalInfo.Latlang.Should().BeEquivalentTo(capitalCountry.Latlang);
-
             }
             #endregion
         }
-
 
         //=============
         //   Test 2
@@ -362,18 +308,15 @@ namespace TestFrame.Tests.CountriesTest
         [Fact, TestPriority(2)]
         public async Task Check_Latitude_Longitude()
         {
-            var response = await restFactory.Create()
+            var response = await _restBuilder.Create()
                                              .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                                              .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
 
 
-            //Create new object "createCountryModel" based on CountryModel
             var createCountryModel = new CountryModel()
             {
-
                 Latlng = new List<double> { 46.0, 25.0 },
-
             };
 
             messagebody = JsonConvert.SerializeObject("mesaj");
@@ -385,27 +328,10 @@ namespace TestFrame.Tests.CountriesTest
             using (new AssertionScope())
             {
 
-                //==========================================================
-                //Check HTTP status code
-                //==========================================================
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
+                response.Content.Should().NotBeNull();
 
-                //==========================================================
-                //Check object is not null
-                //==========================================================
                 getResponse.Should().NotBeNull();
-
-                //==========================================================
-                //Check country latlng
-                //Latlng[0] = latitude
-                //Latlng[1] = longitude
-                //Latitude and longitude are a pair of numbers (coordinates)
-                //used to describe a position on the plane of a geographic
-                //coordinate system. The numbers are in decimal degrees format
-                //and range from -90 to 90 for latitude
-                //and -180 to 180 for longitude.
-                //==========================================================
                 getResponse[0].Latlng.Should().NotBeNullOrEmpty();
                 getResponse[0].Latlng[0].Should().BeInRange(-90, 90);
                 getResponse[0].Latlng[1].Should().BeInRange(-180, 180);
@@ -413,14 +339,13 @@ namespace TestFrame.Tests.CountriesTest
             #endregion
         }
 
-
         //=============
         //   Test 3
         //=============
         [Fact, TestPriority(3)]
         public async Task Check_Continents()
         {
-            var response = await restFactory.Create()
+            var response = await _restBuilder.Create()
                                              .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                                              .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
@@ -430,22 +355,13 @@ namespace TestFrame.Tests.CountriesTest
             using (new AssertionScope())
             {
 
-                //==========================================================
-                //Check HTTP status code
-                //==========================================================
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
+                response.Content.Should().NotBeNull();
 
-                //==========================================================
-                //Check object is not null
-                //==========================================================
                 getResponse.Should().NotBeNull();
 
-                //==========================================================
-                //Check that continent is in the list of expected continents
-                //==========================================================
-                var Continents = new List<string> { "Africa", "Antarctica", "Asia", "Europe", "North America", "Australia/Oceania", "South America" };
-                getResponse[0].Continents.Should().ContainSingle(continent => Continents.Contains(continent));
+                var continents = new List<string> { "Africa", "Antarctica", "Asia", "Europe", "North America", "Australia/Oceania", "South America" };
+                getResponse[0].Continents.Should().ContainSingle(continent => continents.Contains(continent));
 
             }
             #endregion
@@ -458,62 +374,54 @@ namespace TestFrame.Tests.CountriesTest
         [Fact, TestPriority(4)]
         public async Task Get_Country_By_Name_Negative_Test()
         {
-            var response = await restFactory.Create()
+            var response = await _restBuilder.Create()
                                             .WithRequest($"/name/{TestFixture.Name}", Method.Get)
                                             .Execute<List<CountryModel>>(TestFixture.Client);
             var getResponse = response.Data;
 
             var values = getResponse[0].Currencies.Currency;
 
-            //Create new object "wrongNameCountry" based on NameModel
             var wrongNameCountry = new NameModel()
             {
                 Common = "Rooomaaaaniiiaaaa",
                 Official = "Roamaaniaa"
             };
 
-            //Create new object "wrongIddCountry" based on IddModel
             var wrongIddCountry = new IddModel()
             {
                 Root = "+7",
                 Suffixes = new List<string> { "8" }
             };
 
-            //Create new object "wrongCarCountry" based on CarModel
             var wrongCarCountry = new CarModel()
             {
                 Signs = new List<string> { "ROOO" },
                 Side = "left"
             };
 
-            //Create new object "wrongCapitalCountry" based on CapitalInfoModel
             var wrongCapitalCountry = new CapitalInfoModel()
             {
                 Latlang = new List<double> { 43.43, 25.1 }
             };
 
-            //Create new dictonary "wrongValuesCurrency" based on CurrenciesModel
-            Dictionary<string, string> wrongValuesCurrency = new Dictionary<string, string>
+            var wrongValuesCurrency = new Dictionary<string, string>
             {
                 {"name", "Romanian ron" },
                 {"symbol", "ron" }
             };
 
-            //Create new object "wrongPostalcodeCountry" based on PostalCodeModel
             var wrongPostalcodeCountry = new PostalCodeModel()
             {
                 Format = "####",
                 Regex = "^(\\d{4})$"
             };
 
-            //Create new object "wrongMaspCountry" based on MapsModel
             var wrongMapsCountry = new MapsModel()
             {
                 GoogleMaps = "https://goo.gl/maps/845hAgCf1mDkN3vr5",
                 OpenStreetMaps = "https://www.openstreetmap.org/relation/90685"
             };
 
-            //Create new object "wrongFlagCountry" based on FlagsModel
             var wrongFlagCountry = new FlagsModel()
             {
                 Png = "https://flagcdn.com/w320/ro.jpg",
@@ -521,8 +429,6 @@ namespace TestFrame.Tests.CountriesTest
                 Alt = "The flag of Romania is composed of three equal vertical bands of navy blue, green and red."
             };
 
-
-            //Create new object "wrongCountryModel" based on CountryModel
             var wrongCountryModel = new CountryModel()
             {
                 Cca2 = "ROTest",
@@ -553,7 +459,7 @@ namespace TestFrame.Tests.CountriesTest
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
-                response.Content.FirstOrDefault();
+                response.Content.Should().NotBeNull();
 
                 getResponse.Should().NotBeNull();
 

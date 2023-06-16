@@ -8,14 +8,14 @@ namespace TestFrame
         public IEnumerable<TTestCase> OrderTestCases<TTestCase>(
         IEnumerable<TTestCase> testCases) where TTestCase : ITestCase
         {
-            string assemblyName = typeof(TestPriorityAttribute).AssemblyQualifiedName!;      
+            string assemblyName = typeof(TestPriorityAttribute).AssemblyQualifiedName!;
             var sortedMethods = new SortedDictionary<int, List<TTestCase>>();
             foreach (TTestCase testCase in testCases)
             {
                 int priority = testCase.TestMethod.Method
                     .GetCustomAttributes(assemblyName)
                     .FirstOrDefault()
-                    ?.GetNamedArgument<int>(nameof(TestPriorityAttribute.Sequence)) ?? 0;            
+                    ?.GetNamedArgument<int>(nameof(TestPriorityAttribute.Sequence)) ?? 0;
 
                 GetOrCreate(sortedMethods, priority).Add(testCase);
             }

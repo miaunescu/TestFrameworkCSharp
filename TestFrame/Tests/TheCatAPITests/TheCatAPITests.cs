@@ -1,12 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using TestFrame.Base;
 using TestFrame.Fixtures;
 using TestFrame.Models.TheCatApi;
@@ -18,10 +13,11 @@ namespace TestFrame.Tests.TheCatAPITests
 {
     public class TheCatAPITests : OrderedAcceptanceTestsBase<TheCatApiTestFixture>
     {
+        private const string _theCatApi = "TheCatApi";
         public TheCatAPITests(TheCatApiTestFixture testFixture, ITestOutputHelper outputHelper) : base(testFixture, outputHelper)
         {
-            TestFixture.ApiKey = config.GetSection("TheCatApi")["ApiKey"];
-            var api = config.GetSection("TheCatApi")["TheCatApiUri"];
+            TestFixture.ApiKey = config.GetSection(_theCatApi)["ApiKey"];
+            var api = config.GetSection(_theCatApi)["TheCatApiUri"];
             TestFixture.Api = api;
             TestFixture.Client = RestClientFactory.CreateBasicClient(api);
         }
@@ -34,7 +30,6 @@ namespace TestFrame.Tests.TheCatAPITests
             var request = new RestRequest($"/v1/votes/{TestFixture.VoteId}", Method.Get);
             request.AddHeader("x-api-key", $"{TestFixture.ApiKey}");
             request.AddHeader("exchangeId", TestFixture.CorrelationId);
-
 
             var response = await TestFixture.Client.ExecuteAsync<GetCatVotesModel>(request);
             var responseGet = response.Data;
@@ -56,7 +51,6 @@ namespace TestFrame.Tests.TheCatAPITests
             request.AddHeader("x-api-key", $"{TestFixture.ApiKey}");
             request.AddHeader("exchangeId", TestFixture.CorrelationId);
 
-
             var createCatVotesModel = new CreateCatVotesModel()
             {
                 ImageId = "BkIEhN3pG",
@@ -73,11 +67,12 @@ namespace TestFrame.Tests.TheCatAPITests
 
             using (new AssertionScope())
             {
+                response.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.Created);
                 responsePost.Should().NotBeNull();
-                responsePost.ImageId.Should().Be(createCatVotesModel.ImageId);
-                responsePost.SubId.Should().Be(createCatVotesModel.SubId);
-                responsePost.Value.Should().Be(createCatVotesModel.Value);
+                responsePost.ImageId.Should().NotBeNullOrEmpty().And.Be(createCatVotesModel.ImageId);
+                responsePost.SubId.Should().NotBeNullOrEmpty().And.Be(createCatVotesModel.SubId);
+                responsePost.Value.Should().BeGreaterThan(0).And.Be(createCatVotesModel.Value);
             }
         }
 
@@ -93,8 +88,10 @@ namespace TestFrame.Tests.TheCatAPITests
             var response = await TestFixture.Client.ExecuteAsync<DeleteVoteResponseModel>(request);
             var responseDelete = response.Data;
 
-            using(new AssertionScope())
+            using (new AssertionScope())
             {
+                response.Should().NotBeNull();
+                responseDelete.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 responseDelete.Message.Should().Be("SUCCESS");
             }
@@ -123,8 +120,9 @@ namespace TestFrame.Tests.TheCatAPITests
 
             using (new AssertionScope())
             {
+                response.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-                responsePost.Should().BeNull();             
+                responsePost.Should().BeNull();
             }
         }
     }

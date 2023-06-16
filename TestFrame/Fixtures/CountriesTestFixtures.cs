@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestFrame.Base;
-
-namespace TestFrame.Fixtures
+﻿namespace TestFrame.Fixtures
 {
     public class CountriesTestFixtures : RestClientFixture
     {
