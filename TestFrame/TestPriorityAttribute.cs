@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace TestFrame
+﻿namespace TestFrame
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class TestPriorityAttribute : Attribute

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 using Xunit.Sdk;
 using static TestFrame.Attributes.TestCaseAttribute;
 
 namespace TestFrame.Attributes
 {
-    public class TestCaseDiscoverer: ITraitDiscoverer
+    public class TestCaseDiscoverer : ITraitDiscoverer
     {
         public IEnumerable<KeyValuePair<string, string>> GetTraits(IAttributeInfo traitAttribute)
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace TestFrame.Models.TheCatApi
 {
@@ -26,6 +21,6 @@ namespace TestFrame.Models.TheCatApi
         [JsonPropertyName("country_code")]
         public string CountryCode { get; set; }
 
-       // public string Image { get; set; }
+        // public string Image { get; set; }
     }
 }

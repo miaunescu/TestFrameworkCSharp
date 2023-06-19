@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestFrame.Models.Northwind
+﻿namespace TestFrame.Models.Northwind
 {
     public class NorthwindCustomersModel
     {
